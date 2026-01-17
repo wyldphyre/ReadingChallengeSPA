@@ -313,13 +313,17 @@
                 return;
             }
 
-            container.innerHTML = challenges.map((c, index) => {
+            const sorted = challenges
+                .map((c, index) => ({ ...c, originalIndex: index }))
+                .sort((a, b) => (b.year || 0) - (a.year || 0));
+
+            container.innerHTML = sorted.map((c) => {
                 const percent = Math.min(100, Math.round((c.completed / c.target) * 100));
                 return `
                     <div class="challenge-card">
                         <div class="challenge-header">
                             <span class="challenge-name">${c.year || 'Unknown'}</span>
-                            <button class="delete-btn" onclick="deleteChallenge(${index})">×</button>
+                            <button class="delete-btn" onclick="deleteChallenge(${c.originalIndex})">×</button>
                         </div>
                         <div class="progress-bar">
                             <div class="progress-fill" style="width: ${percent}%"></div>
@@ -329,8 +333,8 @@
                                 <strong>${c.completed}</strong> of <strong>${c.target}</strong> (${percent}%)
                             </span>
                             <div class="counter-controls">
-                                <button class="counter-btn minus" onclick="updateCompleted(${index}, -1)">−</button>
-                                <button class="counter-btn plus" onclick="updateCompleted(${index}, 1)">+</button>
+                                <button class="counter-btn minus" onclick="updateCompleted(${c.originalIndex}, -1)">−</button>
+                                <button class="counter-btn plus" onclick="updateCompleted(${c.originalIndex}, 1)">+</button>
                             </div>
                         </div>
                     </div>
