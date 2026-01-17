@@ -56,4 +56,12 @@ Tap the gear icon in the header to access settings:
 - [x] Allow editing an existing challenge
 - [x] Introduce a 'locked' concept for challenges
 - [x] Lock challenges for previous years by default when loading the page
+- [ ] Only show statistics on the current years challenge
+- [ ] Add an icon for the app
+- [ ] Add a version to the app
 - [ ] Work on colour scheme 
+
+## Bugs
+
+- [ ] When adding a challenge for a past year, it isn't automatically locked #1
+- [ ] 
