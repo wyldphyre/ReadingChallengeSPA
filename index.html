@@ -350,6 +350,15 @@
             background: #ff4757;
         }
 
+        .version-info {
+            margin-top: 16px;
+            padding-top: 12px;
+            border-top: 1px solid #e0e0e0;
+            font-size: 0.85em;
+            color: #999;
+            text-align: center;
+        }
+
         .settings-panel button {
             margin-bottom: 12px;
         }
@@ -372,6 +381,7 @@
             <button onclick="document.getElementById('importFile').click()">Import Data</button>
             <input type="file" id="importFile" accept=".json" onchange="importData(event)" style="display:none">
             <button class="reset-btn" onclick="resetAllData()">Reset All Data</button>
+            <div class="version-info" id="versionInfo"></div>
         </div>
 
         <button class="add-btn" onclick="toggleAddForm()">Add New Challenge</button>
@@ -401,6 +411,7 @@
     </div>
 
     <script>
+        const APP_VERSION = '0.9';
         const STORAGE_KEY = 'reading_challenges';
         let editingIndex = null;
         const expandedCards = new Set();
@@ -792,8 +803,9 @@
             document.getElementById('appIcon').href = canvas.toDataURL('image/png');
         }
 
-        // Generate icon, lock previous years, expand current year, and render
+        // Initialize app
         generateAppIcon();
+        document.getElementById('versionInfo').textContent = `Version ${APP_VERSION}`;
         lockPreviousYears();
         expandCurrentYear();
         renderChallenges();
