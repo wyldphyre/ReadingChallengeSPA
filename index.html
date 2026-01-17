@@ -402,6 +402,7 @@
     <script>
         const STORAGE_KEY = 'reading_challenges';
         let editingIndex = null;
+        const expandedCards = new Set();
 
         const ICON_LOCKED = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><rect x="3" y="10" width="18" height="12" rx="2"/><path d="M7 10V7a5 5 0 1 1 10 0v3" fill="none" stroke="currentColor" stroke-width="2.5"/></svg>';
         const ICON_UNLOCKED = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><rect x="3" y="10" width="18" height="12" rx="2"/><path d="M7 10V7a5 5 0 1 1 10 0" fill="none" stroke="currentColor" stroke-width="2.5"/></svg>';
@@ -440,8 +441,9 @@
                 const excess = booksCompleted - c.target;
                 const locked = c.locked ?? false;
                 const stats = calculateStats(c.year, c.target, booksCompleted);
+                const isExpanded = expandedCards.has(c.originalIndex);
                 return `
-                    <div class="challenge-card" onclick="toggleExpand(event, this)">
+                    <div class="challenge-card${isExpanded ? ' expanded' : ''}" onclick="toggleExpand(event, ${c.originalIndex})">
                         <div class="challenge-header">
                             <span class="challenge-name">${c.year || 'Unknown'}</span>
                             <div class="card-actions">
@@ -531,9 +533,14 @@
             };
         }
 
-        function toggleExpand(event, card) {
+        function toggleExpand(event, index) {
             if (event.target.closest('button')) return;
-            card.classList.toggle('expanded');
+            if (expandedCards.has(index)) {
+                expandedCards.delete(index);
+            } else {
+                expandedCards.add(index);
+            }
+            renderChallenges();
         }
 
         function saveChallenge() {
