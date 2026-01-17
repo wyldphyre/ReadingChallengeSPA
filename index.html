@@ -244,6 +244,14 @@
             font-weight: 600;
         }
 
+        .ahead {
+            color: #4cd964;
+        }
+
+        .behind {
+            color: #ff4757;
+        }
+
         .stats {
             display: flex;
             justify-content: space-between;
@@ -460,6 +468,10 @@
                                 <span class="detail-value">${stats.monthsRemaining}</span>
                             </div>
                             <div class="detail-row">
+                                <span class="detail-label">Current Rate</span>
+                                <span class="detail-value">${stats.currentRate} bpm (${stats.booksAhead})</span>
+                            </div>
+                            <div class="detail-row">
                                 <span class="detail-label">Required Rate</span>
                                 <span class="detail-value">${stats.requiredRate} bpm</span>
                             </div>
@@ -484,26 +496,38 @@
             const currentYear = now.getFullYear();
 
             if (!year || year < currentYear) {
-                return { monthsRemaining: '0.0', requiredRate: 'N/A', dailyRate: 'N/A' };
+                return { monthsRemaining: '0.0', requiredRate: 'N/A', dailyRate: 'N/A', currentRate: 'N/A', booksAhead: 'N/A' };
             }
 
             if (year > currentYear) {
-                return { monthsRemaining: '12.0', requiredRate: 'N/A', dailyRate: 'N/A' };
+                return { monthsRemaining: '12.0', requiredRate: 'N/A', dailyRate: 'N/A', currentRate: 'N/A', booksAhead: 'N/A' };
             }
 
+            const startOfYear = new Date(year, 0, 1);
             const endOfYear = new Date(year, 11, 31, 23, 59, 59);
+            const msElapsed = now - startOfYear;
             const msRemaining = endOfYear - now;
+            const daysElapsed = msElapsed / (1000 * 60 * 60 * 24);
             const daysRemaining = Math.max(0, msRemaining / (1000 * 60 * 60 * 24));
+            const monthsElapsed = daysElapsed / 30.44;
             const monthsRemaining = daysRemaining / 30.44;
 
             const booksRemaining = Math.max(0, target - booksCompleted);
             const requiredRate = monthsRemaining > 0 ? (booksRemaining / monthsRemaining).toFixed(1) : 'N/A';
             const dailyRate = daysRemaining > 0 ? ((booksRemaining / daysRemaining) * 100).toFixed(1) + '%' : 'N/A';
+            const currentRate = monthsElapsed > 0 ? (booksCompleted / monthsElapsed).toFixed(1) : 'N/A';
+
+            const expectedBooks = target * (monthsElapsed / 12);
+            const booksAhead = booksCompleted - expectedBooks;
+            const booksAheadClass = booksAhead >= 0 ? 'ahead' : 'behind';
+            const booksAheadDisplay = `<span class="${booksAheadClass}">${booksAhead >= 0 ? '+' : ''}${booksAhead.toFixed(1)}</span>`;
 
             return {
                 monthsRemaining: monthsRemaining.toFixed(1),
                 requiredRate: booksRemaining === 0 ? 'Complete' : requiredRate,
-                dailyRate: booksRemaining === 0 ? 'Complete' : dailyRate
+                dailyRate: booksRemaining === 0 ? 'Complete' : dailyRate,
+                currentRate: currentRate,
+                booksAhead: booksAheadDisplay
             };
         }
 
