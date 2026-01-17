@@ -6,6 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Reading">
+    <link rel="apple-touch-icon" id="appIcon">
     <title>Reading Challenges</title>
     <style>
         * {
@@ -749,7 +750,50 @@
             });
         }
 
-        // Lock previous years, expand current year, and render
+        function generateAppIcon() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 180;
+            canvas.height = 180;
+            const ctx = canvas.getContext('2d');
+
+            // Draw gradient background
+            const gradient = ctx.createLinearGradient(0, 0, 180, 180);
+            gradient.addColorStop(0, '#667eea');
+            gradient.addColorStop(1, '#764ba2');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 180, 180);
+
+            // Draw open book
+            ctx.fillStyle = 'white';
+            ctx.beginPath();
+            ctx.moveTo(40, 45);
+            ctx.lineTo(85, 55);
+            ctx.lineTo(85, 140);
+            ctx.lineTo(40, 130);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.moveTo(140, 45);
+            ctx.lineTo(95, 55);
+            ctx.lineTo(95, 140);
+            ctx.lineTo(140, 130);
+            ctx.closePath();
+            ctx.fill();
+
+            // Book spine
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(90, 50);
+            ctx.lineTo(90, 145);
+            ctx.stroke();
+
+            document.getElementById('appIcon').href = canvas.toDataURL('image/png');
+        }
+
+        // Generate icon, lock previous years, expand current year, and render
+        generateAppIcon();
         lockPreviousYears();
         expandCurrentYear();
         renderChallenges();
