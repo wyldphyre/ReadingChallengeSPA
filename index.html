@@ -20,9 +20,9 @@
             padding: 20px;
             padding-top: max(20px, env(safe-area-inset-top));
             padding-bottom: max(20px, env(safe-area-inset-bottom));
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #121212;
             min-height: 100vh;
-            color: #333;
+            color: #e0e0e0;
         }
 
         .container {
@@ -31,11 +31,11 @@
         }
 
         h1 {
-            color: white;
+            color: #ffffff;
             text-align: center;
             margin-bottom: 24px;
             font-size: 1.8em;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            text-shadow: none;
         }
 
         .add-btn {
@@ -43,11 +43,11 @@
         }
 
         .add-form {
-            background: white;
+            background: #1e1e1e;
             border-radius: 16px;
             padding: 20px;
             margin-bottom: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             display: none;
         }
 
@@ -58,7 +58,7 @@
         .add-form h2 {
             margin: 0 0 16px 0;
             font-size: 1.1em;
-            color: #555;
+            color: #ffffff;
         }
 
         .form-row {
@@ -74,17 +74,19 @@
         label {
             display: block;
             font-size: 0.85em;
-            color: #666;
+            color: #888;
             margin-bottom: 4px;
         }
 
         input {
             width: 100%;
             padding: 12px;
-            border: 2px solid #e0e0e0;
+            border: 2px solid #3a3a3a;
             border-radius: 10px;
             font-size: 16px;
             transition: border-color 0.2s;
+            background: #2a2a2a;
+            color: #e0e0e0;
         }
 
         input:focus {
@@ -117,10 +119,10 @@
         }
 
         .challenge-card {
-            background: white;
+            background: #1e1e1e;
             border-radius: 16px;
             padding: 16px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
 
         .challenge-card.expandable {
@@ -131,7 +133,7 @@
             display: none;
             margin-top: 12px;
             padding-top: 12px;
-            border-top: 1px solid #e0e0e0;
+            border-top: 1px solid #3a3a3a;
         }
 
         .challenge-card.expanded .challenge-details {
@@ -150,12 +152,12 @@
         }
 
         .detail-label {
-            color: #666;
+            color: #888;
         }
 
         .detail-value {
             font-weight: 600;
-            color: #333;
+            color: #e0e0e0;
         }
 
         .challenge-header {
@@ -168,7 +170,7 @@
         .challenge-name {
             font-weight: 600;
             font-size: 1.1em;
-            color: #333;
+            color: #ffffff;
         }
 
         .card-actions {
@@ -177,7 +179,7 @@
         }
 
         .lock-btn {
-            background: #a0a0a0;
+            background: #3a3a3a;
             width: 32px;
             height: 32px;
             padding: 0;
@@ -189,7 +191,7 @@
         }
 
         .lock-btn.locked {
-            background: #f0ad4e;
+            background: #cc8800;
         }
 
         .edit-btn {
@@ -206,13 +208,13 @@
 
         .edit-btn:disabled,
         .counter-btn:disabled {
-            background: #ccc;
+            background: #3a3a3a;
             opacity: 0.5;
             cursor: not-allowed;
         }
 
         .delete-btn {
-            background: #ff4757;
+            background: #dc3545;
             width: 32px;
             height: 32px;
             padding: 0;
@@ -224,7 +226,7 @@
         }
 
         .progress-bar {
-            background: #e0e0e0;
+            background: #3a3a3a;
             border-radius: 10px;
             height: 24px;
             overflow: hidden;
@@ -240,20 +242,20 @@
         }
 
         .progress-fill.complete {
-            background: linear-gradient(90deg, #4cd964 0%, #2ea84d 100%);
+            background: linear-gradient(90deg, #28a745 0%, #20c997 100%);
         }
 
         .excess {
-            color: #4cd964;
+            color: #28a745;
             font-weight: 600;
         }
 
         .ahead {
-            color: #4cd964;
+            color: #28a745;
         }
 
         .behind {
-            color: #ff4757;
+            color: #dc3545;
         }
 
         .stats {
@@ -264,11 +266,11 @@
 
         .stat-text {
             font-size: 0.95em;
-            color: #666;
+            color: #888;
         }
 
         .stat-text strong {
-            color: #333;
+            color: #e0e0e0;
         }
 
         .counter-controls {
@@ -289,16 +291,16 @@
         }
 
         .counter-btn.minus {
-            background: #ff6b7a;
+            background: #dc3545;
         }
 
         .counter-btn.plus {
-            background: #4cd964;
+            background: #28a745;
         }
 
         .empty-state {
             text-align: center;
-            color: white;
+            color: #888;
             padding: 40px 20px;
             opacity: 0.9;
         }
@@ -319,7 +321,7 @@
         }
 
         .settings-btn {
-            background: rgba(255,255,255,0.2);
+            background: #1e1e1e;
             width: 44px;
             height: 44px;
             padding: 0;
@@ -331,11 +333,11 @@
         }
 
         .settings-panel {
-            background: white;
+            background: #1e1e1e;
             border-radius: 16px;
             padding: 20px;
             margin-bottom: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             display: none;
         }
 
@@ -346,19 +348,19 @@
         .settings-panel h2 {
             margin: 0 0 16px 0;
             font-size: 1.1em;
-            color: #555;
+            color: #ffffff;
         }
 
         .reset-btn {
-            background: #ff4757;
+            background: #dc3545;
         }
 
         .version-info {
             margin-top: 16px;
             padding-top: 12px;
-            border-top: 1px solid #e0e0e0;
+            border-top: 1px solid #3a3a3a;
             font-size: 0.85em;
-            color: #999;
+            color: #888;
             text-align: center;
         }
 
@@ -772,15 +774,15 @@
             canvas.height = 180;
             const ctx = canvas.getContext('2d');
 
-            // Draw gradient background
-            const gradient = ctx.createLinearGradient(0, 0, 180, 180);
-            gradient.addColorStop(0, '#667eea');
-            gradient.addColorStop(1, '#764ba2');
-            ctx.fillStyle = gradient;
+            // Draw dark background
+            ctx.fillStyle = '#1e1e1e';
             ctx.fillRect(0, 0, 180, 180);
 
-            // Draw open book
-            ctx.fillStyle = 'white';
+            // Draw open book with purple gradient
+            const bookGradient = ctx.createLinearGradient(40, 45, 140, 140);
+            bookGradient.addColorStop(0, '#667eea');
+            bookGradient.addColorStop(1, '#764ba2');
+            ctx.fillStyle = bookGradient;
             ctx.beginPath();
             ctx.moveTo(40, 45);
             ctx.lineTo(85, 55);
