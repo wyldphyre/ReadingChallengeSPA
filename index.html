@@ -603,11 +603,14 @@
             }
 
             const challenges = loadChallenges();
+            const currentYear = new Date().getFullYear();
+            const shouldLock = year < currentYear;
 
             if (editingIndex !== null) {
-                challenges[editingIndex] = { year, target, booksCompleted: Math.max(0, booksCompleted) };
+                const existingLocked = challenges[editingIndex].locked;
+                challenges[editingIndex] = { year, target, booksCompleted: Math.max(0, booksCompleted), locked: existingLocked || shouldLock };
             } else {
-                challenges.push({ year, target, booksCompleted: Math.max(0, booksCompleted) });
+                challenges.push({ year, target, booksCompleted: Math.max(0, booksCompleted), locked: shouldLock });
             }
 
             saveChallenges(challenges);
