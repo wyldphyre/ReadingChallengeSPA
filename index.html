@@ -135,6 +135,23 @@
             color: #333;
         }
 
+        .card-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .edit-btn {
+            background: #667eea;
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            border-radius: 8px;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
         .delete-btn {
             background: #ff4757;
             width: 32px;
@@ -293,7 +310,7 @@
                     <input type="number" id="booksCompleted" placeholder="0" min="0">
                 </div>
             </div>
-            <button onclick="addChallenge()">Add Challenge</button>
+            <button id="formSubmitBtn" onclick="saveChallenge()">Add Challenge</button>
         </div>
 
         <div class="challenges" id="challenges"></div>
@@ -301,6 +318,7 @@
 
     <script>
         const STORAGE_KEY = 'reading_challenges';
+        let editingIndex = null;
 
         function loadChallenges() {
             const data = localStorage.getItem(STORAGE_KEY);
@@ -335,7 +353,10 @@
                     <div class="challenge-card">
                         <div class="challenge-header">
                             <span class="challenge-name">${c.year || 'Unknown'}</span>
-                            <button class="delete-btn" onclick="deleteChallenge(${c.originalIndex})">×</button>
+                            <div class="card-actions">
+                                <button class="edit-btn" onclick="editChallenge(${c.originalIndex})">&#9998;</button>
+                                <button class="delete-btn" onclick="deleteChallenge(${c.originalIndex})">×</button>
+                            </div>
                         </div>
                         <div class="progress-bar">
                             <div class="progress-fill" style="width: ${percent}%"></div>
@@ -360,7 +381,7 @@
             return div.innerHTML;
         }
 
-        function addChallenge() {
+        function saveChallenge() {
             const yearInput = document.getElementById('year');
             const targetInput = document.getElementById('target');
             const booksCompletedInput = document.getElementById('booksCompleted');
@@ -375,7 +396,13 @@
             }
 
             const challenges = loadChallenges();
-            challenges.push({ year, target, booksCompleted: Math.max(0, booksCompleted) });
+
+            if (editingIndex !== null) {
+                challenges[editingIndex] = { year, target, booksCompleted: Math.max(0, booksCompleted) };
+            } else {
+                challenges.push({ year, target, booksCompleted: Math.max(0, booksCompleted) });
+            }
+
             saveChallenges(challenges);
 
             yearInput.value = '';
@@ -383,7 +410,39 @@
             booksCompletedInput.value = '';
 
             renderChallenges();
-            toggleAddForm();
+            closeForm();
+        }
+
+        function editChallenge(index) {
+            const challenges = loadChallenges();
+            const challenge = challenges[index];
+
+            if (!challenge) return;
+
+            document.getElementById('year').value = challenge.year || '';
+            document.getElementById('target').value = challenge.target || '';
+            document.getElementById('booksCompleted').value = challenge.booksCompleted ?? 0;
+
+            editingIndex = index;
+            document.getElementById('formSubmitBtn').textContent = 'Save Changes';
+            document.querySelector('.add-form h2').textContent = 'Edit Challenge';
+
+            const form = document.getElementById('addForm');
+            if (!form.classList.contains('open')) {
+                form.classList.add('open');
+            }
+            document.getElementById('year').focus();
+        }
+
+        function closeForm() {
+            const form = document.getElementById('addForm');
+            form.classList.remove('open');
+            editingIndex = null;
+            document.getElementById('formSubmitBtn').textContent = 'Add Challenge';
+            document.querySelector('.add-form h2').textContent = 'New Challenge';
+            document.getElementById('year').value = '';
+            document.getElementById('target').value = '';
+            document.getElementById('booksCompleted').value = '';
         }
 
         function updateCompleted(index, delta) {
@@ -411,8 +470,13 @@
 
         function toggleAddForm() {
             const form = document.getElementById('addForm');
-            form.classList.toggle('open');
             if (form.classList.contains('open')) {
+                closeForm();
+            } else {
+                editingIndex = null;
+                document.getElementById('formSubmitBtn').textContent = 'Add Challenge';
+                document.querySelector('.add-form h2').textContent = 'New Challenge';
+                form.classList.add('open');
                 document.getElementById('year').focus();
             }
         }
