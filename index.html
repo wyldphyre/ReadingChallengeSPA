@@ -204,11 +204,65 @@
         .empty-state p {
             font-size: 1.1em;
         }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .header h1 {
+            margin: 0;
+        }
+
+        .settings-btn {
+            background: rgba(255,255,255,0.2);
+            width: 44px;
+            height: 44px;
+            padding: 0;
+            border-radius: 12px;
+            font-size: 1.5em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .settings-panel {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .settings-panel.open {
+            display: block;
+        }
+
+        .settings-panel h2 {
+            margin: 0 0 16px 0;
+            font-size: 1.1em;
+            color: #555;
+        }
+
+        .reset-btn {
+            background: #ff4757;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Reading Challenges</h1>
+        <div class="header">
+            <h1>Reading Challenges</h1>
+            <button class="settings-btn" onclick="toggleSettings()">&#9881;</button>
+        </div>
+
+        <div class="settings-panel" id="settingsPanel">
+            <h2>Settings</h2>
+            <button class="reset-btn" onclick="resetAllData()">Reset All Data</button>
+        </div>
 
         <div class="add-form">
             <h2>Add New Challenge</h2>
@@ -330,6 +384,19 @@
                 challenges.splice(index, 1);
                 saveChallenges(challenges);
                 renderChallenges();
+            }
+        }
+
+        function toggleSettings() {
+            const panel = document.getElementById('settingsPanel');
+            panel.classList.toggle('open');
+        }
+
+        function resetAllData() {
+            if (confirm('Are you sure you want to reset all data? This cannot be undone.')) {
+                localStorage.removeItem(STORAGE_KEY);
+                renderChallenges();
+                toggleSettings();
             }
         }
 
