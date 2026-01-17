@@ -60,8 +60,3 @@ Tap the gear icon in the header to access settings:
 - [ ] Add an icon for the app
 - [ ] Add a version to the app
 - [ ] Work on colour scheme 
-
-## Bugs
-
-- [ ] When adding a challenge for a past year, it isn't automatically locked #1
-- [ ] 
