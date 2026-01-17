@@ -214,8 +214,8 @@
             <h2>Add New Challenge</h2>
             <div class="form-row">
                 <div class="form-group">
-                    <label for="name">Challenge Name</label>
-                    <input type="text" id="name" placeholder="e.g., 2024 Books">
+                    <label for="year">Year</label>
+                    <input type="number" id="year" placeholder="2026" min="1900" max="2100">
                 </div>
             </div>
             <div class="form-row">
@@ -264,7 +264,7 @@
                 return `
                     <div class="challenge-card">
                         <div class="challenge-header">
-                            <span class="challenge-name">${escapeHtml(c.name)}</span>
+                            <span class="challenge-name">${c.year || 'Unknown'}</span>
                             <button class="delete-btn" onclick="deleteChallenge(${index})">×</button>
                         </div>
                         <div class="progress-bar">
@@ -291,24 +291,24 @@
         }
 
         function addChallenge() {
-            const nameInput = document.getElementById('name');
+            const yearInput = document.getElementById('year');
             const targetInput = document.getElementById('target');
             const completedInput = document.getElementById('completed');
 
-            const name = nameInput.value.trim();
+            const year = parseInt(yearInput.value) || 0;
             const target = parseInt(targetInput.value) || 0;
             const completed = parseInt(completedInput.value) || 0;
 
-            if (!name || target < 1) {
-                alert('Please enter a name and a target of at least 1.');
+            if (year < 1900 || year > 2100 || target < 1) {
+                alert('Please enter a valid year (1900-2100) and a target of at least 1.');
                 return;
             }
 
             const challenges = loadChallenges();
-            challenges.push({ name, target, completed: Math.max(0, completed) });
+            challenges.push({ year, target, completed: Math.max(0, completed) });
             saveChallenges(challenges);
 
-            nameInput.value = '';
+            yearInput.value = '';
             targetInput.value = '';
             completedInput.value = '';
 
