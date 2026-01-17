@@ -276,6 +276,14 @@
         .reset-btn {
             background: #ff4757;
         }
+
+        .settings-panel button {
+            margin-bottom: 12px;
+        }
+
+        .settings-panel button:last-child {
+            margin-bottom: 0;
+        }
     </style>
 </head>
 <body>
@@ -287,6 +295,9 @@
 
         <div class="settings-panel" id="settingsPanel">
             <h2>Settings</h2>
+            <button onclick="exportData()">Export Data</button>
+            <button onclick="document.getElementById('importFile').click()">Import Data</button>
+            <input type="file" id="importFile" accept=".json" onchange="importData(event)" style="display:none">
             <button class="reset-btn" onclick="resetAllData()">Reset All Data</button>
         </div>
 
@@ -479,6 +490,44 @@
                 form.classList.add('open');
                 document.getElementById('year').focus();
             }
+        }
+
+        function exportData() {
+            const challenges = loadChallenges();
+            const json = JSON.stringify(challenges, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'reading-challenges.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (!Array.isArray(data)) {
+                        throw new Error('Invalid format');
+                    }
+                    saveChallenges(data);
+                    renderChallenges();
+                    toggleSettings();
+                    alert('Data imported successfully.');
+                } catch (err) {
+                    alert('Failed to import data. Please check the file format.');
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
         }
 
         function resetAllData() {
