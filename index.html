@@ -120,6 +120,38 @@
             border-radius: 16px;
             padding: 16px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            cursor: pointer;
+        }
+
+        .challenge-details {
+            display: none;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .challenge-card.expanded .challenge-details {
+            display: block;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+        }
+
+        .detail-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .detail-label {
+            color: #666;
+        }
+
+        .detail-value {
+            font-weight: 600;
+            color: #333;
         }
 
         .challenge-header {
@@ -399,8 +431,9 @@
                 const targetMet = booksCompleted >= c.target;
                 const excess = booksCompleted - c.target;
                 const locked = c.locked ?? false;
+                const stats = calculateStats(c.year, c.target, booksCompleted);
                 return `
-                    <div class="challenge-card">
+                    <div class="challenge-card" onclick="toggleExpand(event, this)">
                         <div class="challenge-header">
                             <span class="challenge-name">${c.year || 'Unknown'}</span>
                             <div class="card-actions">
@@ -421,6 +454,20 @@
                                 <button class="counter-btn plus" onclick="updateCompleted(${c.originalIndex}, 1)"${locked ? ' disabled' : ''}>+</button>
                             </div>
                         </div>
+                        <div class="challenge-details">
+                            <div class="detail-row">
+                                <span class="detail-label">Months Remaining</span>
+                                <span class="detail-value">${stats.monthsRemaining}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Required Rate</span>
+                                <span class="detail-value">${stats.requiredRate} bpm</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Required Rate</span>
+                                <span class="detail-value">${stats.dailyRate} per day</span>
+                            </div>
+                        </div>
                     </div>
                 `;
             }).join('');
@@ -430,6 +477,39 @@
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
+        }
+
+        function calculateStats(year, target, booksCompleted) {
+            const now = new Date();
+            const currentYear = now.getFullYear();
+
+            if (!year || year < currentYear) {
+                return { monthsRemaining: '0.0', requiredRate: 'N/A', dailyRate: 'N/A' };
+            }
+
+            if (year > currentYear) {
+                return { monthsRemaining: '12.0', requiredRate: 'N/A', dailyRate: 'N/A' };
+            }
+
+            const endOfYear = new Date(year, 11, 31, 23, 59, 59);
+            const msRemaining = endOfYear - now;
+            const daysRemaining = Math.max(0, msRemaining / (1000 * 60 * 60 * 24));
+            const monthsRemaining = daysRemaining / 30.44;
+
+            const booksRemaining = Math.max(0, target - booksCompleted);
+            const requiredRate = monthsRemaining > 0 ? (booksRemaining / monthsRemaining).toFixed(1) : 'N/A';
+            const dailyRate = daysRemaining > 0 ? ((booksRemaining / daysRemaining) * 100).toFixed(1) + '%' : 'N/A';
+
+            return {
+                monthsRemaining: monthsRemaining.toFixed(1),
+                requiredRate: booksRemaining === 0 ? 'Complete' : requiredRate,
+                dailyRate: booksRemaining === 0 ? 'Complete' : dailyRate
+            };
+        }
+
+        function toggleExpand(event, card) {
+            if (event.target.closest('button')) return;
+            card.classList.toggle('expanded');
         }
 
         function saveChallenge() {
