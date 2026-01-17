@@ -481,6 +481,14 @@
                                 <span class="detail-label">Required Rate</span>
                                 <span class="detail-value">${stats.dailyRate} per day</span>
                             </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Average Days per Book</span>
+                                <span class="detail-value">${stats.avgDaysPerBook}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Remaining Days per Book</span>
+                                <span class="detail-value">${stats.remainingDaysPerBook}</span>
+                            </div>
                         </div>
                     </div>
                 `;
@@ -498,11 +506,11 @@
             const currentYear = now.getFullYear();
 
             if (!year || year < currentYear) {
-                return { monthsRemaining: '0.0', requiredRate: 'N/A', dailyRate: 'N/A', currentRate: 'N/A', booksAhead: 'N/A' };
+                return { monthsRemaining: '0.0', requiredRate: 'N/A', dailyRate: 'N/A', currentRate: 'N/A', booksAhead: 'N/A', avgDaysPerBook: 'N/A', remainingDaysPerBook: 'N/A' };
             }
 
             if (year > currentYear) {
-                return { monthsRemaining: '12.0', requiredRate: 'N/A', dailyRate: 'N/A', currentRate: 'N/A', booksAhead: 'N/A' };
+                return { monthsRemaining: '12.0', requiredRate: 'N/A', dailyRate: 'N/A', currentRate: 'N/A', booksAhead: 'N/A', avgDaysPerBook: 'N/A', remainingDaysPerBook: 'N/A' };
             }
 
             const startOfYear = new Date(year, 0, 1);
@@ -523,13 +531,17 @@
             const booksAhead = booksCompleted - expectedBooks;
             const booksAheadClass = booksAhead >= 0 ? 'ahead' : 'behind';
             const booksAheadDisplay = `<span class="${booksAheadClass}">${booksAhead >= 0 ? '+' : ''}${booksAhead.toFixed(1)}</span>`;
+            const avgDaysPerBook = booksCompleted > 0 ? (daysElapsed / booksCompleted).toFixed(1) : 'N/A';
+            const remainingDaysPerBook = booksRemaining > 0 ? (daysRemaining / booksRemaining).toFixed(1) : 'N/A';
 
             return {
                 monthsRemaining: monthsRemaining.toFixed(1),
                 requiredRate: booksRemaining === 0 ? 'Complete' : requiredRate,
                 dailyRate: booksRemaining === 0 ? 'Complete' : dailyRate,
                 currentRate: currentRate,
-                booksAhead: booksAheadDisplay
+                booksAhead: booksAheadDisplay,
+                avgDaysPerBook: avgDaysPerBook,
+                remainingDaysPerBook: booksRemaining === 0 ? 'Complete' : remainingDaysPerBook
             };
         }
 
