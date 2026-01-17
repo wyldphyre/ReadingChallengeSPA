@@ -6,10 +6,15 @@ A simple single-page application for tracking yearly reading challenge statistic
 
 - Track multiple yearly reading challenges
 - Set a reading target and track completed reads
-- Visual progress bar showing percentage complete
+- Visual progress bar showing percentage complete (turns green when target met)
 - Increment/decrement buttons for quick updates
+- Edit existing challenges
+- Lock/unlock challenges (past years auto-lock)
+- Expandable statistics for current year challenge
+- Export and import data as JSON
 - Data persists locally using localStorage
 - Challenges sorted by year (newest first)
+- Dark mode color scheme
 - Settings panel with reset data option
 
 ## Usage
@@ -25,11 +30,16 @@ A simple single-page application for tracking yearly reading challenge statistic
 
 - Use the **+** button to increment completed reads
 - Use the **−** button to decrement completed reads
+- Use the **pencil** button to edit a challenge
+- Use the **lock** button to lock/unlock a challenge
 - Use the **×** button to delete a challenge
+- Tap a challenge card to expand and view statistics (current year only)
 
 ### Settings
 
 Tap the gear icon in the header to access settings:
+- **Export Data** - Download challenges as a JSON file
+- **Import Data** - Restore challenges from a JSON file
 - **Reset All Data** - Clears all stored challenges (with confirmation)
 
 ## Installation on iPhone
@@ -46,17 +56,3 @@ Tap the gear icon in the header to access settings:
 - Uses localStorage for data persistence
 - iOS web app meta tags for home screen support
 - Safe area insets for notched devices
-
-## To Do
-
-- [x] Hide the new challenge section by default
-- [x] Implement export and import of data
-- [x] Show excess books when goal exceeds target
-- [x] Add statistics for each year
-- [x] Allow editing an existing challenge
-- [x] Introduce a 'locked' concept for challenges
-- [x] Lock challenges for previous years by default when loading the page
-- [x] Only show statistics on the current years challenge
-- [x] Add an icon for the app
-- [x] Add a version to the app
-- [x] Work on colour scheme 
