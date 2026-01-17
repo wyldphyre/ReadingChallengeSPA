@@ -37,12 +37,21 @@
             text-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
+        .add-btn {
+            margin-bottom: 20px;
+        }
+
         .add-form {
             background: white;
             border-radius: 16px;
             padding: 20px;
             margin-bottom: 20px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .add-form.open {
+            display: block;
         }
 
         .add-form h2 {
@@ -264,8 +273,10 @@
             <button class="reset-btn" onclick="resetAllData()">Reset All Data</button>
         </div>
 
-        <div class="add-form">
-            <h2>Add New Challenge</h2>
+        <button class="add-btn" onclick="toggleAddForm()">Add New Challenge</button>
+
+        <div class="add-form" id="addForm">
+            <h2>New Challenge</h2>
             <div class="form-row">
                 <div class="form-group">
                     <label for="year">Year</label>
@@ -372,6 +383,7 @@
             booksCompletedInput.value = '';
 
             renderChallenges();
+            toggleAddForm();
         }
 
         function updateCompleted(index, delta) {
@@ -395,6 +407,14 @@
         function toggleSettings() {
             const panel = document.getElementById('settingsPanel');
             panel.classList.toggle('open');
+        }
+
+        function toggleAddForm() {
+            const form = document.getElementById('addForm');
+            form.classList.toggle('open');
+            if (form.classList.contains('open')) {
+                document.getElementById('year').focus();
+            }
         }
 
         function resetAllData() {
