@@ -51,7 +51,7 @@ Tap the gear icon in the header to access settings:
 
 - [x] Hide the new challenge section by default
 - [x] Implement export and import of data
-- [ ] Show excess books when goal exceeds target
+- [x] Show excess books when goal exceeds target
 - [ ] Add statistics for each year
 - [ ] Allow editing an existing challenge
 - [ ] Introduce a 'locked' concept for challenges
