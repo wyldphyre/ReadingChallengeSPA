@@ -140,6 +140,22 @@
             gap: 8px;
         }
 
+        .lock-btn {
+            background: #a0a0a0;
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .lock-btn.locked {
+            background: #f0ad4e;
+        }
+
         .edit-btn {
             background: #667eea;
             width: 32px;
@@ -150,6 +166,13 @@
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+
+        .edit-btn:disabled,
+        .counter-btn:disabled {
+            background: #ccc;
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
         .delete-btn {
@@ -340,6 +363,9 @@
         const STORAGE_KEY = 'reading_challenges';
         let editingIndex = null;
 
+        const ICON_LOCKED = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><rect x="3" y="10" width="18" height="12" rx="2"/><path d="M7 10V7a5 5 0 1 1 10 0v3" fill="none" stroke="currentColor" stroke-width="2.5"/></svg>';
+        const ICON_UNLOCKED = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><rect x="3" y="10" width="18" height="12" rx="2"/><path d="M7 10V7a5 5 0 1 1 10 0" fill="none" stroke="currentColor" stroke-width="2.5"/></svg>';
+
         function loadChallenges() {
             const data = localStorage.getItem(STORAGE_KEY);
             return data ? JSON.parse(data) : [];
@@ -372,12 +398,14 @@
                 const barPercent = Math.min(100, percent);
                 const targetMet = booksCompleted >= c.target;
                 const excess = booksCompleted - c.target;
+                const locked = c.locked ?? false;
                 return `
                     <div class="challenge-card">
                         <div class="challenge-header">
                             <span class="challenge-name">${c.year || 'Unknown'}</span>
                             <div class="card-actions">
-                                <button class="edit-btn" onclick="editChallenge(${c.originalIndex})">&#9998;</button>
+                                <button class="lock-btn${locked ? ' locked' : ''}" onclick="toggleLock(${c.originalIndex})">${locked ? ICON_LOCKED : ICON_UNLOCKED}</button>
+                                <button class="edit-btn" onclick="editChallenge(${c.originalIndex})"${locked ? ' disabled' : ''}>&#9998;</button>
                                 <button class="delete-btn" onclick="deleteChallenge(${c.originalIndex})">×</button>
                             </div>
                         </div>
@@ -389,8 +417,8 @@
                                 <strong>${booksCompleted}</strong> of <strong>${c.target}</strong> (${percent}%)${excess > 0 ? ` <span class="excess">+${excess}</span>` : ''}
                             </span>
                             <div class="counter-controls">
-                                <button class="counter-btn minus" onclick="updateCompleted(${c.originalIndex}, -1)">−</button>
-                                <button class="counter-btn plus" onclick="updateCompleted(${c.originalIndex}, 1)">+</button>
+                                <button class="counter-btn minus" onclick="updateCompleted(${c.originalIndex}, -1)"${locked ? ' disabled' : ''}>−</button>
+                                <button class="counter-btn plus" onclick="updateCompleted(${c.originalIndex}, 1)"${locked ? ' disabled' : ''}>+</button>
                             </div>
                         </div>
                     </div>
@@ -466,6 +494,15 @@
             document.getElementById('year').value = '';
             document.getElementById('target').value = '';
             document.getElementById('booksCompleted').value = '';
+        }
+
+        function toggleLock(index) {
+            const challenges = loadChallenges();
+            if (challenges[index]) {
+                challenges[index].locked = !challenges[index].locked;
+                saveChallenges(challenges);
+                renderChallenges();
+            }
         }
 
         function updateCompleted(index, delta) {
@@ -550,7 +587,25 @@
             }
         }
 
-        // Initial render
+        function lockPreviousYears() {
+            const currentYear = new Date().getFullYear();
+            const challenges = loadChallenges();
+            let changed = false;
+
+            challenges.forEach(c => {
+                if (c.year && c.year < currentYear && !c.locked) {
+                    c.locked = true;
+                    changed = true;
+                }
+            });
+
+            if (changed) {
+                saveChallenges(challenges);
+            }
+        }
+
+        // Lock previous years and render
+        lockPreviousYears();
         renderChallenges();
     </script>
 </body>

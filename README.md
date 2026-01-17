@@ -53,7 +53,7 @@ Tap the gear icon in the header to access settings:
 - [x] Implement export and import of data
 - [x] Show excess books when goal exceeds target
 - [ ] Add statistics for each year
-- [ ] Allow editing an existing challenge
-- [ ] Introduce a 'locked' concept for challenges
-- [ ] Lock challenges for previous years by default when loading the page
+- [x] Allow editing an existing challenge
+- [x] Introduce a 'locked' concept for challenges
+- [x] Lock challenges for previous years by default when loading the page
 - [ ] 
