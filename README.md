@@ -59,4 +59,4 @@ Tap the gear icon in the header to access settings:
 - [x] Only show statistics on the current years challenge
 - [x] Add an icon for the app
 - [x] Add a version to the app
-- [ ] Work on colour scheme 
+- [x] Work on colour scheme 
