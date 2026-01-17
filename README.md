@@ -46,3 +46,14 @@ Tap the gear icon in the header to access settings:
 - Uses localStorage for data persistence
 - iOS web app meta tags for home screen support
 - Safe area insets for notched devices
+
+## To Do
+
+- [x] Hide the new challenge section by default
+- [x] Implement export and import of data
+- [ ] Show excess books when goal exceeds target
+- [ ] Add statistics for each year
+- [ ] Allow editing an existing challenge
+- [ ] Introduce a 'locked' concept for challenges
+- [ ] Lock challenges for previous years by default when loading the page
+- [ ] 
