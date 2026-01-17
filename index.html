@@ -278,8 +278,8 @@
                     <input type="number" id="target" placeholder="12" min="1">
                 </div>
                 <div class="form-group">
-                    <label for="completed">Completed</label>
-                    <input type="number" id="completed" placeholder="0" min="0">
+                    <label for="booksCompleted">Books Completed</label>
+                    <input type="number" id="booksCompleted" placeholder="0" min="0">
                 </div>
             </div>
             <button onclick="addChallenge()">Add Challenge</button>
@@ -318,7 +318,8 @@
                 .sort((a, b) => (b.year || 0) - (a.year || 0));
 
             container.innerHTML = sorted.map((c) => {
-                const percent = Math.min(100, Math.round((c.completed / c.target) * 100));
+                const booksCompleted = c.booksCompleted ?? 0;
+                const percent = Math.min(100, Math.round((booksCompleted / c.target) * 100));
                 return `
                     <div class="challenge-card">
                         <div class="challenge-header">
@@ -330,7 +331,7 @@
                         </div>
                         <div class="stats">
                             <span class="stat-text">
-                                <strong>${c.completed}</strong> of <strong>${c.target}</strong> (${percent}%)
+                                <strong>${booksCompleted}</strong> of <strong>${c.target}</strong> (${percent}%)
                             </span>
                             <div class="counter-controls">
                                 <button class="counter-btn minus" onclick="updateCompleted(${c.originalIndex}, -1)">−</button>
@@ -351,11 +352,11 @@
         function addChallenge() {
             const yearInput = document.getElementById('year');
             const targetInput = document.getElementById('target');
-            const completedInput = document.getElementById('completed');
+            const booksCompletedInput = document.getElementById('booksCompleted');
 
             const year = parseInt(yearInput.value) || 0;
             const target = parseInt(targetInput.value) || 0;
-            const completed = parseInt(completedInput.value) || 0;
+            const booksCompleted = parseInt(booksCompletedInput.value) || 0;
 
             if (year < 1900 || year > 2100 || target < 1) {
                 alert('Please enter a valid year (1900-2100) and a target of at least 1.');
@@ -363,12 +364,12 @@
             }
 
             const challenges = loadChallenges();
-            challenges.push({ year, target, completed: Math.max(0, completed) });
+            challenges.push({ year, target, booksCompleted: Math.max(0, booksCompleted) });
             saveChallenges(challenges);
 
             yearInput.value = '';
             targetInput.value = '';
-            completedInput.value = '';
+            booksCompletedInput.value = '';
 
             renderChallenges();
         }
@@ -376,7 +377,7 @@
         function updateCompleted(index, delta) {
             const challenges = loadChallenges();
             if (challenges[index]) {
-                challenges[index].completed = Math.max(0, challenges[index].completed + delta);
+                challenges[index].booksCompleted = Math.max(0, (challenges[index].booksCompleted ?? 0) + delta);
                 saveChallenges(challenges);
                 renderChallenges();
             }
