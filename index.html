@@ -417,7 +417,7 @@
     </div>
 
     <script>
-        const APP_VERSION = '1.0.0';
+        const APP_VERSION = '1.0.1';
         const STORAGE_KEY = 'reading_challenges';
         let editingIndex = null;
         const expandedCards = new Set();
@@ -500,11 +500,7 @@
                             </div>
                             <div class="detail-row">
                                 <span class="detail-label">Required Rate</span>
-                                <span class="detail-value">${stats.requiredRate} bpm</span>
-                            </div>
-                            <div class="detail-row">
-                                <span class="detail-label">Required Rate</span>
-                                <span class="detail-value">${stats.dailyRate} per day</span>
+                                <span class="detail-value">${stats.requiredRate} bpm, ${stats.dailyRate} per day</span>
                             </div>
                             <div class="detail-row">
                                 <span class="detail-label">Average Days per Book</span>
