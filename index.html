@@ -372,6 +372,53 @@
             margin-bottom: 0;
         }
 
+        .previous-challenges-section {
+            margin-top: 20px;
+        }
+
+        .previous-challenges-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            background: #1e1e1e;
+            border-radius: 12px;
+            cursor: pointer;
+            user-select: none;
+            margin-bottom: 12px;
+        }
+
+        .previous-challenges-header:hover {
+            background: #2a2a2a;
+        }
+
+        .previous-challenges-header h2 {
+            margin: 0;
+            font-size: 1em;
+            color: #888;
+            font-weight: 500;
+        }
+
+        .collapse-arrow {
+            color: #888;
+            font-size: 0.8em;
+            transition: transform 0.2s;
+        }
+
+        .previous-challenges-header.expanded .collapse-arrow {
+            transform: rotate(90deg);
+        }
+
+        .previous-challenges-content {
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .previous-challenges-content.open {
+            display: flex;
+        }
+
     </style>
 </head>
 <body>
@@ -417,10 +464,11 @@
     </div>
 
     <script>
-        const APP_VERSION = '1.0.1';
+        const APP_VERSION = '1.0.2';
         const STORAGE_KEY = 'reading_challenges';
         let editingIndex = null;
         const expandedCards = new Set();
+        let previousChallengesExpanded = false;
 
         const ICON_LOCKED = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><rect x="3" y="10" width="18" height="12" rx="2"/><path d="M7 10V7a5 5 0 1 1 10 0v3" fill="none" stroke="currentColor" stroke-width="2.5"/></svg>';
         const ICON_UNLOCKED = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><rect x="3" y="10" width="18" height="12" rx="2"/><path d="M7 10V7a5 5 0 1 1 10 0" fill="none" stroke="currentColor" stroke-width="2.5"/></svg>';
@@ -453,7 +501,10 @@
                 .sort((a, b) => (b.year || 0) - (a.year || 0));
 
             const currentYear = new Date().getFullYear();
-            container.innerHTML = sorted.map((c) => {
+            const currentYearChallenges = sorted.filter(c => c.year >= currentYear);
+            const previousYearChallenges = sorted.filter(c => c.year < currentYear);
+
+            function renderChallengeCard(c) {
                 const booksCompleted = c.booksCompleted ?? 0;
                 const percent = Math.round((booksCompleted / c.target) * 100);
                 const barPercent = Math.min(100, percent);
@@ -517,7 +568,25 @@
                         </div>` : ''}
                     </div>
                 `;
-            }).join('');
+            }
+
+            let html = currentYearChallenges.map(renderChallengeCard).join('');
+
+            if (previousYearChallenges.length > 0) {
+                html += `
+                    <div class="previous-challenges-section">
+                        <div class="previous-challenges-header${previousChallengesExpanded ? ' expanded' : ''}" onclick="togglePreviousChallenges()">
+                            <span class="collapse-arrow">▶</span>
+                            <h2>Previous Challenges</h2>
+                        </div>
+                        <div class="previous-challenges-content${previousChallengesExpanded ? ' open' : ''}">
+                            ${previousYearChallenges.map(renderChallengeCard).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
         }
 
         function escapeHtml(text) {
@@ -581,6 +650,11 @@
             } else {
                 expandedCards.add(index);
             }
+            renderChallenges();
+        }
+
+        function togglePreviousChallenges() {
+            previousChallengesExpanded = !previousChallengesExpanded;
             renderChallenges();
         }
 
