@@ -1,7 +1,7 @@
 // Update this version string whenever you deploy a new version of the app.
 // The browser detects when sw.js changes and installs the updated service worker,
 // which then caches the new index.html and discards the old cache.
-const CACHE_NAME = 'reading-challenges-v1.0.4';
+const CACHE_NAME = 'reading-challenges-v1.0.5';
 
 self.addEventListener('install', event => {
     event.waitUntil(

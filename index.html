@@ -173,6 +173,13 @@
             color: #ffffff;
         }
 
+        .expand-arrow {
+            font-size: 0.6em;
+            color: #888;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+
         .card-actions {
             display: flex;
             gap: 8px;
@@ -464,7 +471,7 @@
     </div>
 
     <script>
-        const APP_VERSION = '1.0.4';
+        const APP_VERSION = '1.0.5';
         const STORAGE_KEY = 'reading_challenges';
         let editingIndex = null;
         const expandedCards = new Set();
@@ -517,7 +524,7 @@
                 return `
                     <div class="challenge-card${isCurrentYear ? ' expandable' : ''}${isExpanded ? ' expanded' : ''}"${isCurrentYear ? ` onclick="toggleExpand(event, ${c.originalIndex})"` : ''}>
                         <div class="challenge-header">
-                            <span class="challenge-name">${c.year || 'Unknown'}</span>
+                            <span class="challenge-name">${c.year || 'Unknown'}${isCurrentYear ? `<span class="expand-arrow">${isExpanded ? '▼' : '▶'}</span>` : ''}</span>
                             <div class="card-actions">
                                 <button class="lock-btn${locked ? ' locked' : ''}" onclick="toggleLock(${c.originalIndex})">${locked ? ICON_LOCKED : ICON_UNLOCKED}</button>
                                 <button class="edit-btn" onclick="editChallenge(${c.originalIndex})"${locked ? ' disabled' : ''}>&#9998;</button>
