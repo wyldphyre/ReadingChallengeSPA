@@ -9,6 +9,40 @@
     <link rel="apple-touch-icon" id="appIcon">
     <title>Reading Challenges</title>
     <style>
+        :root {
+            --color-bg: #111318;
+            --color-surface: #1c1f28;
+            --color-surface-hover: #252931;
+            --color-border: #2d3142;
+            --color-text-primary: #eef0f6;
+            --color-text-secondary: #9aa0b8;
+            --color-text-muted: #545b73;
+            --color-accent: #3d8ef5;
+            --color-accent-end: #5b76f0;
+            --color-success: #22c55e;
+            --color-success-end: #14b8a6;
+            --color-danger: #ef4444;
+            --color-warning: #f59e0b;
+            --color-shadow: rgba(0, 0, 0, 0.45);
+        }
+
+        [data-theme="light"] {
+            --color-bg: #f4f5f9;
+            --color-surface: #ffffff;
+            --color-surface-hover: #eef0f7;
+            --color-border: #dde0eb;
+            --color-text-primary: #1a1d2e;
+            --color-text-secondary: #4b5168;
+            --color-text-muted: #9299b0;
+            --color-accent: #1a6ef5;
+            --color-accent-end: #3d5ef0;
+            --color-success: #16a34a;
+            --color-success-end: #0d9488;
+            --color-danger: #dc2626;
+            --color-warning: #d97706;
+            --color-shadow: rgba(0, 0, 0, 0.08);
+        }
+
         * {
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
@@ -20,9 +54,10 @@
             padding: 20px;
             padding-top: max(20px, env(safe-area-inset-top));
             padding-bottom: max(20px, env(safe-area-inset-bottom));
-            background: #121212;
+            background: var(--color-bg);
             min-height: 100vh;
-            color: #e0e0e0;
+            color: var(--color-text-secondary);
+            transition: background 0.2s, color 0.2s;
         }
 
         .container {
@@ -31,7 +66,7 @@
         }
 
         h1 {
-            color: #ffffff;
+            color: var(--color-text-primary);
             text-align: center;
             margin-bottom: 24px;
             font-size: 1.8em;
@@ -43,11 +78,11 @@
         }
 
         .add-form {
-            background: #1e1e1e;
+            background: var(--color-surface);
             border-radius: 16px;
             padding: 20px;
             margin-bottom: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 15px var(--color-shadow);
             display: none;
         }
 
@@ -58,7 +93,7 @@
         .add-form h2 {
             margin: 0 0 16px 0;
             font-size: 1.1em;
-            color: #ffffff;
+            color: var(--color-text-primary);
         }
 
         .form-row {
@@ -74,28 +109,28 @@
         label {
             display: block;
             font-size: 0.85em;
-            color: #888;
+            color: var(--color-text-muted);
             margin-bottom: 4px;
         }
 
         input {
             width: 100%;
             padding: 12px;
-            border: 2px solid #3a3a3a;
+            border: 2px solid var(--color-border);
             border-radius: 10px;
             font-size: 16px;
-            transition: border-color 0.2s;
-            background: #2a2a2a;
-            color: #e0e0e0;
+            transition: border-color 0.2s, background 0.2s;
+            background: var(--color-surface-hover);
+            color: var(--color-text-secondary);
         }
 
         input:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: var(--color-accent);
         }
 
         button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-end) 100%);
             color: white;
             border: none;
             padding: 14px 24px;
@@ -119,10 +154,10 @@
         }
 
         .challenge-card {
-            background: #1e1e1e;
+            background: var(--color-surface);
             border-radius: 16px;
             padding: 16px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 15px var(--color-shadow);
         }
 
         .challenge-card.expandable {
@@ -133,7 +168,7 @@
             display: none;
             margin-top: 12px;
             padding-top: 12px;
-            border-top: 1px solid #3a3a3a;
+            border-top: 1px solid var(--color-border);
         }
 
         .challenge-card.expanded .challenge-details {
@@ -152,12 +187,12 @@
         }
 
         .detail-label {
-            color: #888;
+            color: var(--color-text-muted);
         }
 
         .detail-value {
             font-weight: 600;
-            color: #e0e0e0;
+            color: var(--color-text-secondary);
         }
 
         .challenge-header {
@@ -170,12 +205,12 @@
         .challenge-name {
             font-weight: 600;
             font-size: 1.1em;
-            color: #ffffff;
+            color: var(--color-text-primary);
         }
 
         .expand-arrow {
             font-size: 0.6em;
-            color: #888;
+            color: var(--color-text-muted);
             margin-left: 8px;
             vertical-align: middle;
         }
@@ -186,7 +221,7 @@
         }
 
         .lock-btn {
-            background: #3a3a3a;
+            background: var(--color-border);
             width: 32px;
             height: 32px;
             padding: 0;
@@ -198,11 +233,11 @@
         }
 
         .lock-btn.locked {
-            background: #cc8800;
+            background: var(--color-warning);
         }
 
         .edit-btn {
-            background: #667eea;
+            background: var(--color-accent);
             width: 32px;
             height: 32px;
             padding: 0;
@@ -215,13 +250,13 @@
 
         .edit-btn:disabled,
         .counter-btn:disabled {
-            background: #3a3a3a;
+            background: var(--color-border);
             opacity: 0.5;
             cursor: not-allowed;
         }
 
         .delete-btn {
-            background: #dc3545;
+            background: var(--color-danger);
             width: 32px;
             height: 32px;
             padding: 0;
@@ -233,7 +268,7 @@
         }
 
         .progress-bar {
-            background: #3a3a3a;
+            background: var(--color-border);
             border-radius: 10px;
             height: 24px;
             overflow: hidden;
@@ -241,7 +276,7 @@
         }
 
         .progress-fill {
-            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(90deg, var(--color-accent) 0%, var(--color-accent-end) 100%);
             height: 100%;
             border-radius: 10px;
             transition: width 0.3s ease;
@@ -249,20 +284,20 @@
         }
 
         .progress-fill.complete {
-            background: linear-gradient(90deg, #28a745 0%, #20c997 100%);
+            background: linear-gradient(90deg, var(--color-success) 0%, var(--color-success-end) 100%);
         }
 
         .excess {
-            color: #28a745;
+            color: var(--color-success);
             font-weight: 600;
         }
 
         .ahead {
-            color: #28a745;
+            color: var(--color-success);
         }
 
         .behind {
-            color: #dc3545;
+            color: var(--color-danger);
         }
 
         .stats {
@@ -273,11 +308,11 @@
 
         .stat-text {
             font-size: 0.95em;
-            color: #888;
+            color: var(--color-text-muted);
         }
 
         .stat-text strong {
-            color: #e0e0e0;
+            color: var(--color-text-secondary);
         }
 
         .counter-controls {
@@ -298,16 +333,16 @@
         }
 
         .counter-btn.minus {
-            background: #dc3545;
+            background: var(--color-danger);
         }
 
         .counter-btn.plus {
-            background: #28a745;
+            background: var(--color-success);
         }
 
         .empty-state {
             text-align: center;
-            color: #888;
+            color: var(--color-text-muted);
             padding: 40px 20px;
             opacity: 0.9;
         }
@@ -328,7 +363,8 @@
         }
 
         .settings-btn {
-            background: #1e1e1e;
+            background: var(--color-surface);
+            color: var(--color-text-secondary);
             width: 44px;
             height: 44px;
             padding: 0;
@@ -340,11 +376,11 @@
         }
 
         .settings-panel {
-            background: #1e1e1e;
+            background: var(--color-surface);
             border-radius: 16px;
             padding: 20px;
             margin-bottom: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 15px var(--color-shadow);
             display: none;
         }
 
@@ -355,27 +391,71 @@
         .settings-panel h2 {
             margin: 0 0 16px 0;
             font-size: 1.1em;
-            color: #ffffff;
+            color: var(--color-text-primary);
+        }
+
+        .settings-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .settings-label {
+            font-size: 0.9em;
+            color: var(--color-text-secondary);
+        }
+
+        .theme-toggle {
+            display: flex;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--color-border);
+        }
+
+        .theme-btn {
+            background: transparent;
+            color: var(--color-text-muted);
+            border: none;
+            border-radius: 0;
+            padding: 6px 16px;
+            margin-bottom: 0;
+            font-size: 0.85em;
+            font-weight: 500;
+            width: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.15s, color 0.15s;
+        }
+
+        .theme-btn + .theme-btn {
+            border-left: 1px solid var(--color-border);
+        }
+
+        .theme-btn.active {
+            background: var(--color-accent);
+            color: white;
         }
 
         .reset-btn {
-            background: #dc3545;
+            background: var(--color-danger);
         }
 
         .version-info {
             margin-top: 16px;
             padding-top: 12px;
-            border-top: 1px solid #3a3a3a;
+            border-top: 1px solid var(--color-border);
             font-size: 0.85em;
-            color: #888;
+            color: var(--color-text-muted);
             text-align: center;
         }
 
-        .settings-panel button {
+        .settings-panel > button {
             margin-bottom: 12px;
         }
 
-        .settings-panel button:last-child {
+        .settings-panel > button:last-child {
             margin-bottom: 0;
         }
 
@@ -388,7 +468,7 @@
             align-items: center;
             gap: 8px;
             padding: 12px 16px;
-            background: #1e1e1e;
+            background: var(--color-surface);
             border-radius: 12px;
             cursor: pointer;
             user-select: none;
@@ -396,18 +476,18 @@
         }
 
         .previous-challenges-header:hover {
-            background: #2a2a2a;
+            background: var(--color-surface-hover);
         }
 
         .previous-challenges-header h2 {
             margin: 0;
             font-size: 1em;
-            color: #888;
+            color: var(--color-text-muted);
             font-weight: 500;
         }
 
         .collapse-arrow {
-            color: #888;
+            color: var(--color-text-muted);
             font-size: 0.8em;
             transition: transform 0.2s;
         }
@@ -437,6 +517,13 @@
 
         <div class="settings-panel" id="settingsPanel">
             <h2>Settings</h2>
+            <div class="settings-row">
+                <span class="settings-label">Theme</span>
+                <div class="theme-toggle">
+                    <button class="theme-btn" id="themeBtnDark" onclick="setTheme('dark')">Dark</button>
+                    <button class="theme-btn" id="themeBtnLight" onclick="setTheme('light')">Light</button>
+                </div>
+            </div>
             <button onclick="exportData()">Export Data</button>
             <button onclick="document.getElementById('importFile').click()">Import Data</button>
             <input type="file" id="importFile" accept=".json" onchange="importData(event)" style="display:none">
@@ -471,8 +558,9 @@
     </div>
 
     <script>
-        const APP_VERSION = '1.0.7';
+        const APP_VERSION = '1.1.0';
         const STORAGE_KEY = 'reading_challenges';
+        const SETTINGS_KEY = 'reading_settings';
         let editingIndex = null;
         const expandedCards = new Set();
         let previousChallengesExpanded = false;
@@ -488,6 +576,28 @@
 
         function saveChallenges(challenges) {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(challenges));
+        }
+
+        function loadSettings() {
+            const data = localStorage.getItem(SETTINGS_KEY);
+            return data ? JSON.parse(data) : {};
+        }
+
+        function saveSettings(settings) {
+            localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+        }
+
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            document.getElementById('themeBtnDark').classList.toggle('active', theme === 'dark');
+            document.getElementById('themeBtnLight').classList.toggle('active', theme === 'light');
+        }
+
+        function setTheme(theme) {
+            const settings = loadSettings();
+            settings.theme = theme;
+            saveSettings(settings);
+            applyTheme(theme);
         }
 
         function renderChallenges() {
@@ -920,6 +1030,7 @@
         try { generateAppIcon(); } catch (e) { console.warn('Icon generation failed:', e); }
         document.getElementById('settingsBtn').innerHTML = ICON_GEAR;
         document.getElementById('versionInfo').textContent = `Version ${APP_VERSION}`;
+        applyTheme(loadSettings().theme || 'dark');
         lockPreviousYears();
         expandCurrentYear();
         renderChallenges();
