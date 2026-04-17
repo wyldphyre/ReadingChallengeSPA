@@ -12,15 +12,14 @@
         :root {
             --color-bg: #111318;
             --color-surface: #1c1f28;
+            --color-surface-translucent: rgba(28, 31, 40, 0.72);
             --color-surface-hover: #252931;
             --color-border: #2d3142;
             --color-text-primary: #eef0f6;
             --color-text-secondary: #9aa0b8;
             --color-text-muted: #545b73;
             --color-accent: #3d8ef5;
-            --color-accent-end: #5b76f0;
-            --color-success: #22c55e;
-            --color-success-end: #14b8a6;
+            --color-success: #10b981;
             --color-danger: #ef4444;
             --color-warning: #f59e0b;
             --color-shadow: rgba(0, 0, 0, 0.45);
@@ -29,15 +28,14 @@
         [data-theme="light"] {
             --color-bg: #f4f5f9;
             --color-surface: #ffffff;
+            --color-surface-translucent: rgba(255, 255, 255, 0.72);
             --color-surface-hover: #eef0f7;
             --color-border: #dde0eb;
             --color-text-primary: #1a1d2e;
             --color-text-secondary: #4b5168;
             --color-text-muted: #9299b0;
             --color-accent: #1a6ef5;
-            --color-accent-end: #3d5ef0;
-            --color-success: #16a34a;
-            --color-success-end: #0d9488;
+            --color-success: #059669;
             --color-danger: #dc2626;
             --color-warning: #d97706;
             --color-shadow: rgba(0, 0, 0, 0.08);
@@ -69,7 +67,9 @@
             color: var(--color-text-primary);
             text-align: center;
             margin-bottom: 24px;
-            font-size: 1.8em;
+            font-size: 2.2em;
+            font-weight: 700;
+            letter-spacing: -0.022em;
             text-shadow: none;
         }
 
@@ -79,10 +79,10 @@
 
         .add-form {
             background: var(--color-surface);
-            border-radius: 16px;
+            border-radius: 20px;
             padding: 20px;
             margin-bottom: 20px;
-            box-shadow: 0 4px 15px var(--color-shadow);
+            box-shadow: 0 1px 3px var(--color-shadow);
             display: none;
         }
 
@@ -92,7 +92,9 @@
 
         .add-form h2 {
             margin: 0 0 16px 0;
-            font-size: 1.1em;
+            font-size: 1.15em;
+            font-weight: 620;
+            letter-spacing: -0.01em;
             color: var(--color-text-primary);
         }
 
@@ -130,13 +132,14 @@
         }
 
         button {
-            background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-end) 100%);
+            background: var(--color-accent);
             color: white;
             border: none;
             padding: 14px 24px;
-            border-radius: 10px;
+            border-radius: 12px;
             font-size: 1em;
-            font-weight: 600;
+            font-weight: 590;
+            letter-spacing: -0.01em;
             cursor: pointer;
             width: 100%;
             transition: transform 0.1s, opacity 0.2s;
@@ -155,9 +158,9 @@
 
         .challenge-card {
             background: var(--color-surface);
-            border-radius: 16px;
-            padding: 16px;
-            box-shadow: 0 4px 15px var(--color-shadow);
+            border-radius: 20px;
+            padding: 18px;
+            box-shadow: 0 1px 3px var(--color-shadow);
         }
 
         .challenge-card.expandable {
@@ -203,16 +206,23 @@
         }
 
         .challenge-name {
-            font-weight: 600;
-            font-size: 1.1em;
+            font-weight: 620;
+            font-size: 1.15em;
+            letter-spacing: -0.01em;
             color: var(--color-text-primary);
         }
 
         .expand-arrow {
-            font-size: 0.6em;
             color: var(--color-text-muted);
             margin-left: 8px;
+            display: inline-flex;
+            align-items: center;
             vertical-align: middle;
+            transition: transform 0.2s ease;
+        }
+
+        .challenge-card.expanded .expand-arrow {
+            transform: rotate(90deg);
         }
 
         .card-actions {
@@ -221,7 +231,8 @@
         }
 
         .lock-btn {
-            background: var(--color-border);
+            background: var(--color-surface-hover);
+            color: var(--color-text-muted);
             width: 32px;
             height: 32px;
             padding: 0;
@@ -229,11 +240,11 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
         }
 
         .lock-btn.locked {
-            background: var(--color-warning);
+            background: color-mix(in srgb, var(--color-warning) 16%, transparent);
+            color: var(--color-warning);
         }
 
         .edit-btn {
@@ -276,7 +287,7 @@
         }
 
         .progress-fill {
-            background: linear-gradient(90deg, var(--color-accent) 0%, var(--color-accent-end) 100%);
+            background: var(--color-accent);
             height: 100%;
             border-radius: 10px;
             transition: width 0.3s ease;
@@ -284,7 +295,7 @@
         }
 
         .progress-fill.complete {
-            background: linear-gradient(90deg, var(--color-success) 0%, var(--color-success-end) 100%);
+            background: var(--color-success);
         }
 
         .excess {
@@ -333,11 +344,13 @@
         }
 
         .counter-btn.minus {
-            background: var(--color-danger);
+            background: var(--color-surface-hover);
+            color: var(--color-accent);
+            border: 1px solid var(--color-border);
         }
 
         .counter-btn.plus {
-            background: var(--color-success);
+            background: var(--color-accent);
         }
 
         .empty-state {
@@ -375,47 +388,155 @@
             justify-content: center;
         }
 
+        .sheet-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 10;
+        }
+
+        .sheet-backdrop.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
         .settings-panel {
-            background: var(--color-surface);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 15px var(--color-shadow);
-            display: none;
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            max-width: 500px;
+            margin: 0 auto;
+            background: var(--color-surface-translucent);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border: 1px solid var(--color-border);
+            border-bottom: none;
+            border-radius: 20px 20px 0 0;
+            padding: 8px 20px 20px;
+            padding-bottom: max(20px, env(safe-area-inset-bottom));
+            box-shadow: 0 -4px 24px var(--color-shadow);
+            transform: translateY(100%);
+            transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+            z-index: 11;
+            max-height: 85vh;
+            overflow-y: auto;
         }
 
         .settings-panel.open {
-            display: block;
+            transform: translateY(0);
+        }
+
+        .sheet-drag-zone {
+            padding: 6px 0 10px;
+            margin: -8px -20px 0;
+            touch-action: none;
+            cursor: grab;
+        }
+
+        .sheet-drag-zone:active {
+            cursor: grabbing;
+        }
+
+        .sheet-handle {
+            width: 36px;
+            height: 5px;
+            background: var(--color-text-muted);
+            border-radius: 3px;
+            margin: 0 auto;
+            opacity: 0.5;
+            pointer-events: none;
         }
 
         .settings-panel h2 {
             margin: 0 0 16px 0;
             font-size: 1.1em;
+            font-weight: 620;
+            letter-spacing: -0.01em;
+            text-align: center;
             color: var(--color-text-primary);
         }
 
+        .settings-group {
+            background: var(--color-surface-hover);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+
         .settings-row {
+            background: transparent;
+            color: var(--color-text-primary);
+            width: 100%;
+            padding: 12px 16px;
+            margin: 0;
+            border: none;
+            border-radius: 0;
+            font-size: 0.95em;
+            font-weight: 400;
+            letter-spacing: -0.005em;
+            text-align: left;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 16px;
+            min-height: 44px;
+            box-sizing: border-box;
+        }
+
+        .settings-row:not(:first-child) {
+            border-top: 1px solid var(--color-border);
+        }
+
+        .settings-row.destructive {
+            color: var(--color-danger);
+            justify-content: center;
+        }
+
+        .settings-chevron {
+            color: var(--color-text-muted);
+            display: inline-flex;
+            align-items: center;
         }
 
         .settings-label {
-            font-size: 0.9em;
-            color: var(--color-text-secondary);
+            font-size: 0.95em;
+            color: var(--color-text-primary);
         }
 
         .theme-toggle {
+            position: relative;
             display: flex;
-            border-radius: 8px;
-            overflow: hidden;
+            padding: 2px;
+            border-radius: 9px;
+            background: var(--color-bg);
             border: 1px solid var(--color-border);
         }
 
+        .theme-thumb {
+            position: absolute;
+            top: 2px;
+            bottom: 2px;
+            left: 2px;
+            width: calc(50% - 2px);
+            background: var(--color-accent);
+            border-radius: 7px;
+            transition: transform 0.25s cubic-bezier(0.32, 0.72, 0, 1);
+            pointer-events: none;
+        }
+
+        .theme-toggle[data-active="light"] .theme-thumb {
+            transform: translateX(100%);
+        }
+
         .theme-btn {
+            position: relative;
+            z-index: 1;
+            flex: 1;
             background: transparent;
-            color: var(--color-text-muted);
+            color: var(--color-text-secondary);
             border: none;
             border-radius: 0;
             padding: 6px 16px;
@@ -426,37 +547,19 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background 0.15s, color 0.15s;
-        }
-
-        .theme-btn + .theme-btn {
-            border-left: 1px solid var(--color-border);
+            transition: color 0.25s ease;
         }
 
         .theme-btn.active {
-            background: var(--color-accent);
             color: white;
         }
 
-        .reset-btn {
-            background: var(--color-danger);
-        }
-
         .version-info {
-            margin-top: 16px;
+            margin-top: 4px;
             padding-top: 12px;
-            border-top: 1px solid var(--color-border);
             font-size: 0.85em;
             color: var(--color-text-muted);
             text-align: center;
-        }
-
-        .settings-panel > button {
-            margin-bottom: 12px;
-        }
-
-        .settings-panel > button:last-child {
-            margin-bottom: 0;
         }
 
         .previous-challenges-section {
@@ -488,7 +591,8 @@
 
         .collapse-arrow {
             color: var(--color-text-muted);
-            font-size: 0.8em;
+            display: inline-flex;
+            align-items: center;
             transition: transform 0.2s;
         }
 
@@ -515,19 +619,36 @@
             <button class="settings-btn" id="settingsBtn" onclick="toggleSettings()"></button>
         </div>
 
+        <div class="sheet-backdrop" id="sheetBackdrop" onclick="toggleSettings()"></div>
         <div class="settings-panel" id="settingsPanel">
+            <div class="sheet-drag-zone" id="sheetDragZone">
+                <div class="sheet-handle"></div>
+            </div>
             <h2>Settings</h2>
-            <div class="settings-row">
-                <span class="settings-label">Theme</span>
-                <div class="theme-toggle">
-                    <button class="theme-btn" id="themeBtnDark" onclick="setTheme('dark')">Dark</button>
-                    <button class="theme-btn" id="themeBtnLight" onclick="setTheme('light')">Light</button>
+            <div class="settings-group">
+                <div class="settings-row">
+                    <span class="settings-label">Theme</span>
+                    <div class="theme-toggle" id="themeToggle" data-active="dark">
+                        <div class="theme-thumb"></div>
+                        <button class="theme-btn" id="themeBtnDark" onclick="setTheme('dark')">Dark</button>
+                        <button class="theme-btn" id="themeBtnLight" onclick="setTheme('light')">Light</button>
+                    </div>
                 </div>
             </div>
-            <button onclick="exportData()">Export Data</button>
-            <button onclick="document.getElementById('importFile').click()">Import Data</button>
+            <div class="settings-group">
+                <button class="settings-row" onclick="exportData()">
+                    <span>Export Data</span>
+                    <span class="settings-chevron" id="chevronExport"></span>
+                </button>
+                <button class="settings-row" onclick="document.getElementById('importFile').click()">
+                    <span>Import Data</span>
+                    <span class="settings-chevron" id="chevronImport"></span>
+                </button>
+                <button class="settings-row destructive" onclick="resetAllData()">
+                    <span>Reset All Data</span>
+                </button>
+            </div>
             <input type="file" id="importFile" accept=".json" onchange="importData(event)" style="display:none">
-            <button class="reset-btn" onclick="resetAllData()">Reset All Data</button>
             <div class="version-info" id="versionInfo"></div>
         </div>
 
@@ -558,7 +679,7 @@
     </div>
 
     <script>
-        const APP_VERSION = '1.1.0';
+        const APP_VERSION = '1.2.0';
         const STORAGE_KEY = 'reading_challenges';
         const SETTINGS_KEY = 'reading_settings';
         let editingIndex = null;
@@ -568,6 +689,11 @@
         const ICON_LOCKED = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><rect x="3" y="10" width="18" height="12" rx="2"/><path d="M7 10V7a5 5 0 1 1 10 0v3" fill="none" stroke="currentColor" stroke-width="2.5"/></svg>';
         const ICON_UNLOCKED = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><rect x="3" y="10" width="18" height="12" rx="2"/><path d="M7 10V7a5 5 0 1 1 10 0" fill="none" stroke="currentColor" stroke-width="2.5"/></svg>';
         const ICON_GEAR = '<svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M19.14 12.94c.04-.31.06-.63.06-.94 0-.31-.02-.63-.06-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.49.49 0 0 0-.49-.41h-3.84a.49.49 0 0 0-.49.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 0 0-.59.22L2.74 8.87a.49.49 0 0 0 .12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.39.3.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.26.41.49.41h3.84c.24 0 .44-.17.49-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32a.49.49 0 0 0-.12-.61l-2.03-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>';
+        const ICON_PLUS = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
+        const ICON_MINUS = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>';
+        const ICON_XMARK = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>';
+        const ICON_PENCIL = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>';
+        const ICON_CHEVRON_RIGHT = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>';
 
         function loadChallenges() {
             const data = localStorage.getItem(STORAGE_KEY);
@@ -589,6 +715,7 @@
 
         function applyTheme(theme) {
             document.documentElement.setAttribute('data-theme', theme);
+            document.getElementById('themeToggle').setAttribute('data-active', theme);
             document.getElementById('themeBtnDark').classList.toggle('active', theme === 'dark');
             document.getElementById('themeBtnLight').classList.toggle('active', theme === 'light');
         }
@@ -634,11 +761,11 @@
                 return `
                     <div class="challenge-card${isCurrentYear ? ' expandable' : ''}${isExpanded ? ' expanded' : ''}"${isCurrentYear ? ` onclick="toggleExpand(event, ${c.originalIndex})"` : ''}>
                         <div class="challenge-header">
-                            <span class="challenge-name">${c.year || 'Unknown'}${isCurrentYear ? `<span class="expand-arrow">${isExpanded ? '▼' : '▶'}</span>` : ''}</span>
+                            <span class="challenge-name">${c.year || 'Unknown'}${isCurrentYear ? `<span class="expand-arrow">${ICON_CHEVRON_RIGHT}</span>` : ''}</span>
                             <div class="card-actions">
                                 <button class="lock-btn${locked ? ' locked' : ''}" onclick="toggleLock(${c.originalIndex})">${locked ? ICON_LOCKED : ICON_UNLOCKED}</button>
-                                <button class="edit-btn" onclick="editChallenge(${c.originalIndex})"${locked ? ' disabled' : ''}>&#9998;</button>
-                                <button class="delete-btn" onclick="deleteChallenge(${c.originalIndex})">×</button>
+                                <button class="edit-btn" onclick="editChallenge(${c.originalIndex})"${locked ? ' disabled' : ''}>${ICON_PENCIL}</button>
+                                <button class="delete-btn" onclick="deleteChallenge(${c.originalIndex})">${ICON_XMARK}</button>
                             </div>
                         </div>
                         <div class="progress-bar">
@@ -649,8 +776,8 @@
                                 <strong>${booksCompleted}</strong> of <strong>${c.target}</strong> (${percent}%)${excess > 0 ? ` <span class="excess">+${excess}</span>` : ''}
                             </span>
                             <div class="counter-controls">
-                                <button class="counter-btn minus" onclick="updateCompleted(${c.originalIndex}, -1)"${locked ? ' disabled' : ''}>−</button>
-                                <button class="counter-btn plus" onclick="updateCompleted(${c.originalIndex}, 1)"${locked ? ' disabled' : ''}>+</button>
+                                <button class="counter-btn minus" onclick="updateCompleted(${c.originalIndex}, -1)"${locked ? ' disabled' : ''}>${ICON_MINUS}</button>
+                                <button class="counter-btn plus" onclick="updateCompleted(${c.originalIndex}, 1)"${locked ? ' disabled' : ''}>${ICON_PLUS}</button>
                             </div>
                         </div>
                         ${isCurrentYear ? `<div class="challenge-details">
@@ -697,7 +824,7 @@
                 html += `
                     <div class="previous-challenges-section">
                         <div class="previous-challenges-header${previousChallengesExpanded ? ' expanded' : ''}" onclick="togglePreviousChallenges()">
-                            <span class="collapse-arrow">▶</span>
+                            <span class="collapse-arrow">${ICON_CHEVRON_RIGHT}</span>
                             <h2>Previous Challenges</h2>
                         </div>
                         <div class="previous-challenges-content${previousChallengesExpanded ? ' open' : ''}">
@@ -880,7 +1007,10 @@
 
         function toggleSettings() {
             const panel = document.getElementById('settingsPanel');
-            panel.classList.toggle('open');
+            const backdrop = document.getElementById('sheetBackdrop');
+            const isOpen = panel.classList.toggle('open');
+            backdrop.classList.toggle('open', isOpen);
+            document.body.style.overflow = isOpen ? 'hidden' : '';
         }
 
         function toggleAddForm() {
@@ -1029,11 +1159,60 @@
         // Initialize app
         try { generateAppIcon(); } catch (e) { console.warn('Icon generation failed:', e); }
         document.getElementById('settingsBtn').innerHTML = ICON_GEAR;
+        document.getElementById('chevronExport').innerHTML = ICON_CHEVRON_RIGHT;
+        document.getElementById('chevronImport').innerHTML = ICON_CHEVRON_RIGHT;
         document.getElementById('versionInfo').textContent = `Version ${APP_VERSION}`;
         applyTheme(loadSettings().theme || 'dark');
         lockPreviousYears();
         expandCurrentYear();
         renderChallenges();
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && document.getElementById('settingsPanel').classList.contains('open')) {
+                toggleSettings();
+            }
+        });
+
+        (function setupSheetDrag() {
+            const sheet = document.getElementById('settingsPanel');
+            const zone = document.getElementById('sheetDragZone');
+            const CLOSE_DISTANCE = 80;
+            const CLOSE_VELOCITY = 0.5;
+            let startY = 0;
+            let startTime = 0;
+            let delta = 0;
+            let dragging = false;
+
+            zone.addEventListener('pointerdown', (e) => {
+                if (!sheet.classList.contains('open')) return;
+                dragging = true;
+                startY = e.clientY;
+                startTime = performance.now();
+                delta = 0;
+                sheet.style.transition = 'none';
+                zone.setPointerCapture(e.pointerId);
+            });
+
+            zone.addEventListener('pointermove', (e) => {
+                if (!dragging) return;
+                delta = Math.max(0, e.clientY - startY);
+                sheet.style.transform = `translateY(${delta}px)`;
+            });
+
+            const endDrag = () => {
+                if (!dragging) return;
+                dragging = false;
+                const velocity = delta / (performance.now() - startTime);
+                sheet.style.transition = '';
+                sheet.style.transform = '';
+                if (delta > CLOSE_DISTANCE || velocity > CLOSE_VELOCITY) {
+                    toggleSettings();
+                }
+            };
+
+            zone.addEventListener('pointerup', endDrag);
+            zone.addEventListener('pointercancel', endDrag);
+        })();
     </script>
 </body>
 </html>
