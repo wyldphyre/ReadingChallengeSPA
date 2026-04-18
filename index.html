@@ -7,6 +7,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Reading">
     <link rel="apple-touch-icon" id="appIcon">
+    <link rel="icon" type="image/svg+xml" id="faviconEl">
     <title>Reading Challenges</title>
     <style>
         :root {
@@ -679,7 +680,7 @@
     </div>
 
     <script>
-        const APP_VERSION = '1.2.0';
+        const APP_VERSION = '1.3.0';
         const STORAGE_KEY = 'reading_challenges';
         const SETTINGS_KEY = 'reading_settings';
         let editingIndex = null;
@@ -1108,45 +1109,92 @@
         }
 
         function generateAppIcon() {
+            // Draw at 512×512 for crisp rendering, using a 180-unit design space
+            const size = 512;
             const canvas = document.createElement('canvas');
-            canvas.width = 180;
-            canvas.height = 180;
+            canvas.width = size;
+            canvas.height = size;
             const ctx = canvas.getContext('2d');
+            const s = size / 180;
+            const cx = 90, cy = 90;
 
-            // Draw dark background
-            ctx.fillStyle = '#1e1e1e';
-            ctx.fillRect(0, 0, 180, 180);
+            function drawBackground() {
+                ctx.save();
+                ctx.scale(s, s);
+                // Rounded-rect background
+                const bgR = 38;
+                ctx.beginPath();
+                ctx.moveTo(bgR, 0);
+                ctx.lineTo(180 - bgR, 0);
+                ctx.arcTo(180, 0,   180, bgR,       bgR);
+                ctx.lineTo(180, 180 - bgR);
+                ctx.arcTo(180, 180, 180 - bgR, 180, bgR);
+                ctx.lineTo(bgR, 180);
+                ctx.arcTo(0,   180, 0, 180 - bgR,   bgR);
+                ctx.lineTo(0, bgR);
+                ctx.arcTo(0,   0,   bgR, 0,          bgR);
+                ctx.closePath();
+                ctx.fillStyle = '#111318';
+                ctx.fill();
 
-            // Draw open book with purple gradient
-            const bookGradient = ctx.createLinearGradient(40, 45, 140, 140);
-            bookGradient.addColorStop(0, '#667eea');
-            bookGradient.addColorStop(1, '#764ba2');
-            ctx.fillStyle = bookGradient;
-            ctx.beginPath();
-            ctx.moveTo(40, 45);
-            ctx.lineTo(85, 55);
-            ctx.lineTo(85, 140);
-            ctx.lineTo(40, 130);
-            ctx.closePath();
-            ctx.fill();
+                // Progress ring: 300° arc, 60° gap at visual bottom
+                // Arc from 120° → 60° clockwise (canvas coords: 0°=right, CW) = 300° sweep
+                ctx.strokeStyle = '#3d8ef5';
+                ctx.lineWidth = 9;
+                ctx.lineCap = 'round';
+                ctx.beginPath();
+                ctx.arc(cx, cy, 68, 2 * Math.PI / 3, Math.PI / 3, false);
+                ctx.stroke();
+                ctx.restore();
+            }
 
-            ctx.beginPath();
-            ctx.moveTo(140, 45);
-            ctx.lineTo(95, 55);
-            ctx.lineTo(95, 140);
-            ctx.lineTo(140, 130);
-            ctx.closePath();
-            ctx.fill();
+            function applyIcons() {
+                document.getElementById('appIcon').href = canvas.toDataURL('image/png');
 
-            // Book spine
-            ctx.strokeStyle = 'white';
-            ctx.lineWidth = 4;
-            ctx.beginPath();
-            ctx.moveTo(90, 50);
-            ctx.lineTo(90, 145);
-            ctx.stroke();
+                // SVG favicon — Font Awesome solid book-open, same composition
+                const faviconSvg =
+                    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">` +
+                    `<rect width="32" height="32" rx="7" fill="#111318"/>` +
+                    `<path d="M9.5 27.3A13 13 0 1 1 22.5 27.3" stroke="#3d8ef5" stroke-width="2.5" fill="none" stroke-linecap="round"/>` +
+                    // FA solid book-open (viewBox 0 0 576 512) scaled/centred in 32×32
+                    `<g transform="translate(10,11.2) scale(0.02083)">` +
+                    `<path fill="white" d="M249.6 471.5c10.8 3.8 22.4-4.1 22.4-15.5V78.6c0-4.2-1.6-8.4-5-11C247.4 52 202.4 32 144 32C93.5 32 46.3 45.3 18.1 56.1C6.8 60.5 0 71.7 0 83.8V454.1c0 11.9 12.8 20.2 24.1 16.5C55.6 460.1 105.5 448 144 448c33.9 0 79 14 105.6 23.5zm76.8 0C353 462 398.1 448 432 448c38.5 0 88.4 12.1 119.9 22.6c11.3 3.8 24.1-4.6 24.1-16.5V83.8c0-12.1-6.8-23.3-18.1-27.6C529.7 45.3 482.5 32 432 32c-58.4 0-103.4 20-123 45.6c-3.3 2.6-5 6.8-5 11V456c0 11.4 11.7 19.3 22.4 15.5z"/>` +
+                    `</g>` +
+                    `</svg>`;
+                const faviconEl = document.getElementById('faviconEl');
+                if (faviconEl) {
+                    faviconEl.href = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(faviconSvg);
+                }
+            }
 
-            document.getElementById('appIcon').href = canvas.toDataURL('image/png');
+            drawBackground();
+
+            // Book: Font Awesome 6 solid "book-open" (viewBox 0 0 576 512)
+            // Loaded as an SVG image so it renders with smooth curves at any resolution
+            const bookSvg =
+                `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">` +
+                `<path fill="white" d="M249.6 471.5c10.8 3.8 22.4-4.1 22.4-15.5V78.6c0-4.2-1.6-8.4-5-11` +
+                `C247.4 52 202.4 32 144 32C93.5 32 46.3 45.3 18.1 56.1C6.8 60.5 0 71.7 0 83.8V454.1` +
+                `c0 11.9 12.8 20.2 24.1 16.5C55.6 460.1 105.5 448 144 448c33.9 0 79 14 105.6 23.5z` +
+                `M326.4 471.5C353 462 398.1 448 432 448c38.5 0 88.4 12.1 119.9 22.6c11.3 3.8 24.1-4.6 24.1-16.5` +
+                `V83.8c0-12.1-6.8-23.3-18.1-27.6C529.7 45.3 482.5 32 432 32c-58.4 0-103.4 20-123 45.6` +
+                `c-3.3 2.6-5 6.8-5 11V456c0 11.4 11.7 19.3 22.4 15.5z"/>` +
+                `</svg>`;
+
+            const bookImg = new Image();
+            bookImg.onload = function() {
+                ctx.save();
+                ctx.scale(s, s);
+                // 36% of design area, nudged slightly downward to sit inside the ring
+                const bookW = 64.8, bookH = bookW * (512 / 576);
+                const bx = (180 - bookW) / 2;
+                const by = (180 - bookH) / 2 + 3.6;
+                ctx.drawImage(bookImg, bx, by, bookW, bookH);
+                ctx.restore();
+                applyIcons();
+            };
+            bookImg.onerror = applyIcons; // graceful fallback
+            bookImg.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(bookSvg);
         }
 
         // Register service worker for offline / home screen use
