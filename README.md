@@ -44,10 +44,18 @@ Tap the gear icon in the header to access settings:
 
 ## Installation on iPhone
 
-1. Open `index.html` in Safari (host it or access via file URL)
-2. Tap the Share button
-3. Select "Add to Home Screen"
-4. The app runs in standalone mode without browser UI
+The service worker (which enables offline use and home screen behaviour) requires the app to be served over HTTPS — it won't activate when opened as a local file. You need to host `index.html` somewhere publicly accessible first.
+
+Simple free options:
+- **GitHub Pages** — push the file to a repo and enable Pages in the repository settings
+- **Netlify Drop** — drag and drop the file at [app.netlify.com/drop](https://app.netlify.com/drop)
+- Any other static web host
+
+Once hosted, open the URL in Safari on your iPhone, then:
+
+1. Tap the Share button (box with arrow)
+2. Select "Add to Home Screen"
+3. The app installs and runs in standalone mode without browser UI
 
 ## Technical Details
 
