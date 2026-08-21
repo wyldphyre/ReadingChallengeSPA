@@ -151,6 +151,13 @@
             opacity: 0.9;
         }
 
+        /* Keyboard users need a visible focus ring; the accent border above only
+           covers inputs, and -webkit-tap-highlight-color is pointer-only. */
+        button:focus-visible {
+            outline: 2px solid var(--color-accent);
+            outline-offset: 2px;
+        }
+
         .challenges {
             display: flex;
             flex-direction: column;
@@ -214,12 +221,20 @@
         }
 
         .expand-arrow {
+            background: transparent;
+            border: none;
+            padding: 0;
+            width: auto;
             color: var(--color-text-muted);
             margin-left: 8px;
             display: inline-flex;
             align-items: center;
             vertical-align: middle;
             transition: transform 0.2s ease;
+        }
+
+        .expand-arrow:active {
+            transform: none;
         }
 
         .challenge-card.expanded .expand-arrow {
@@ -261,6 +276,7 @@
         }
 
         .edit-btn:disabled,
+        .delete-btn:disabled,
         .counter-btn:disabled {
             background: var(--color-border);
             opacity: 0.5;
@@ -567,24 +583,34 @@
             margin-top: 20px;
         }
 
+        /* Wrapper exists only to give the disclosure button heading semantics;
+           neutralise the UA h2 sizing so it does not scale the button's text. */
+        .previous-challenges-heading {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 400;
+        }
+
         .previous-challenges-header {
             display: flex;
             align-items: center;
+            justify-content: flex-start;
             gap: 8px;
+            width: 100%;
             padding: 12px 16px;
             background: var(--color-surface);
             border-radius: 12px;
             cursor: pointer;
             user-select: none;
             margin-bottom: 12px;
+            text-align: left;
         }
 
         .previous-challenges-header:hover {
             background: var(--color-surface-hover);
         }
 
-        .previous-challenges-header h2 {
-            margin: 0;
+        .previous-challenges-title {
             font-size: 1em;
             color: var(--color-text-muted);
             font-weight: 500;
@@ -617,20 +643,20 @@
     <div class="container">
         <div class="header">
             <h1>Reading Challenges</h1>
-            <button class="settings-btn" id="settingsBtn" onclick="toggleSettings()"></button>
+            <button class="settings-btn" id="settingsBtn" aria-label="Settings" aria-expanded="false" aria-controls="settingsPanel" onclick="toggleSettings()"></button>
         </div>
 
-        <div class="sheet-backdrop" id="sheetBackdrop" onclick="toggleSettings()"></div>
-        <div class="settings-panel" id="settingsPanel">
-            <div class="sheet-drag-zone" id="sheetDragZone">
+        <div class="sheet-backdrop" id="sheetBackdrop" aria-hidden="true" onclick="toggleSettings()"></div>
+        <div class="settings-panel" id="settingsPanel" role="dialog" aria-modal="true" aria-label="Settings" aria-hidden="true">
+            <div class="sheet-drag-zone" id="sheetDragZone" aria-hidden="true">
                 <div class="sheet-handle"></div>
             </div>
             <h2>Settings</h2>
             <div class="settings-group">
                 <div class="settings-row">
                     <span class="settings-label">Theme</span>
-                    <div class="theme-toggle" id="themeToggle" data-active="dark">
-                        <div class="theme-thumb"></div>
+                    <div class="theme-toggle" id="themeToggle" role="group" aria-label="Theme" data-active="dark">
+                        <div class="theme-thumb" aria-hidden="true"></div>
                         <button class="theme-btn" id="themeBtnDark" onclick="setTheme('dark')">Dark</button>
                         <button class="theme-btn" id="themeBtnLight" onclick="setTheme('light')">Light</button>
                     </div>
@@ -639,17 +665,17 @@
             <div class="settings-group">
                 <button class="settings-row" onclick="exportData()">
                     <span>Export Data</span>
-                    <span class="settings-chevron" id="chevronExport"></span>
+                    <span class="settings-chevron" id="chevronExport" aria-hidden="true"></span>
                 </button>
                 <button class="settings-row" onclick="document.getElementById('importFile').click()">
                     <span>Import Data</span>
-                    <span class="settings-chevron" id="chevronImport"></span>
+                    <span class="settings-chevron" id="chevronImport" aria-hidden="true"></span>
                 </button>
                 <button class="settings-row destructive" onclick="resetAllData()">
                     <span>Reset All Data</span>
                 </button>
             </div>
-            <input type="file" id="importFile" accept=".json" onchange="importData(event)" style="display:none">
+            <input type="file" id="importFile" accept=".json" aria-hidden="true" tabindex="-1" onchange="importData(event)" style="display:none">
             <div class="version-info" id="versionInfo"></div>
         </div>
 
@@ -680,12 +706,14 @@
     </div>
 
     <script>
-        const APP_VERSION = '1.3.2';
+        const APP_VERSION = '1.3.3';
         const STORAGE_KEY = 'reading_challenges';
         const SETTINGS_KEY = 'reading_settings';
         let editingIndex = null;
         const expandedCards = new Set();
         let previousChallengesExpanded = false;
+        // Set when a service worker update lands while the form is open.
+        let reloadPending = false;
 
         const ICON_LOCKED = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><rect x="3" y="10" width="18" height="12" rx="2"/><path d="M7 10V7a5 5 0 1 1 10 0v3" fill="none" stroke="currentColor" stroke-width="2.5"/></svg>';
         const ICON_UNLOCKED = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><rect x="3" y="10" width="18" height="12" rx="2"/><path d="M7 10V7a5 5 0 1 1 10 0" fill="none" stroke="currentColor" stroke-width="2.5"/></svg>';
@@ -708,8 +736,21 @@
             }
         }
 
+        // localStorage.setItem throws in Safari private browsing and when the
+        // origin's quota is exhausted. Report it rather than letting the
+        // exception abort the caller half-way through an update.
+        function writeStorage(key, value) {
+            try {
+                localStorage.setItem(key, JSON.stringify(value));
+                return true;
+            } catch (err) {
+                alert('Could not save your data. Storage may be full, or private browsing may be blocking it.');
+                return false;
+            }
+        }
+
         function saveChallenges(challenges) {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(challenges));
+            return writeStorage(STORAGE_KEY, challenges);
         }
 
         function loadSettings() {
@@ -722,7 +763,12 @@
         }
 
         function saveSettings(settings) {
-            localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+            return writeStorage(SETTINGS_KEY, settings);
+        }
+
+        // Until the user picks a theme explicitly, follow the system setting.
+        function preferredTheme() {
+            return window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
         }
 
         function applyTheme(theme) {
@@ -773,14 +819,14 @@
                 return `
                     <div class="challenge-card${isCurrentYear ? ' expandable' : ''}${isExpanded ? ' expanded' : ''}"${isCurrentYear ? ` onclick="toggleExpand(event, ${c.originalIndex})"` : ''}>
                         <div class="challenge-header">
-                            <span class="challenge-name">${c.year || 'Unknown'}${isCurrentYear ? `<span class="expand-arrow">${ICON_CHEVRON_RIGHT}</span>` : ''}</span>
+                            <span class="challenge-name">${c.year}${isCurrentYear ? `<button class="expand-arrow" aria-expanded="${isExpanded}" aria-label="${isExpanded ? 'Hide' : 'Show'} ${c.year} statistics" onclick="toggleExpand(event, ${c.originalIndex}, true)">${ICON_CHEVRON_RIGHT}</button>` : ''}</span>
                             <div class="card-actions">
-                                <button class="lock-btn${locked ? ' locked' : ''}" onclick="toggleLock(${c.originalIndex})">${locked ? ICON_LOCKED : ICON_UNLOCKED}</button>
-                                <button class="edit-btn" onclick="editChallenge(${c.originalIndex})"${locked ? ' disabled' : ''}>${ICON_PENCIL}</button>
-                                <button class="delete-btn" onclick="deleteChallenge(${c.originalIndex})">${ICON_XMARK}</button>
+                                <button class="lock-btn${locked ? ' locked' : ''}" aria-label="${locked ? 'Unlock' : 'Lock'} ${c.year} challenge" aria-pressed="${locked}" onclick="toggleLock(${c.originalIndex})">${locked ? ICON_LOCKED : ICON_UNLOCKED}</button>
+                                <button class="edit-btn" aria-label="Edit ${c.year} challenge" onclick="editChallenge(${c.originalIndex})"${locked ? ' disabled' : ''}>${ICON_PENCIL}</button>
+                                <button class="delete-btn" aria-label="Delete ${c.year} challenge" onclick="deleteChallenge(${c.originalIndex})"${locked ? ' disabled' : ''}>${ICON_XMARK}</button>
                             </div>
                         </div>
-                        <div class="progress-bar">
+                        <div class="progress-bar" role="progressbar" aria-label="${c.year} reading progress" aria-valuenow="${booksCompleted}" aria-valuemin="0" aria-valuemax="${c.target}" aria-valuetext="${booksCompleted} of ${c.target} books, ${percent} percent">
                             <div class="progress-fill${targetMet ? ' complete' : ''}" style="width: ${barPercent}%"></div>
                         </div>
                         <div class="stats">
@@ -788,8 +834,8 @@
                                 <strong>${booksCompleted}</strong> of <strong>${c.target}</strong> (${percent}%)${excess > 0 ? ` <span class="excess">+${excess}</span>` : ''}
                             </span>
                             <div class="counter-controls">
-                                <button class="counter-btn minus" onclick="updateCompleted(${c.originalIndex}, -1)"${locked ? ' disabled' : ''}>${ICON_MINUS}</button>
-                                <button class="counter-btn plus" onclick="updateCompleted(${c.originalIndex}, 1)"${locked ? ' disabled' : ''}>${ICON_PLUS}</button>
+                                <button class="counter-btn minus" aria-label="Remove a book from ${c.year}" onclick="updateCompleted(${c.originalIndex}, -1)"${locked ? ' disabled' : ''}>${ICON_MINUS}</button>
+                                <button class="counter-btn plus" aria-label="Add a book to ${c.year}" onclick="updateCompleted(${c.originalIndex}, 1)"${locked ? ' disabled' : ''}>${ICON_PLUS}</button>
                             </div>
                         </div>
                         ${isCurrentYear ? `<div class="challenge-details">
@@ -811,7 +857,7 @@
                             </div>
                             <div class="detail-row">
                                 <span class="detail-label">Required Rate</span>
-                                <span class="detail-value">${stats.requiredRate} bpm, ${stats.dailyRate} per day</span>
+                                <span class="detail-value">${stats.requiredRate === 'Complete' ? 'Complete' : `${stats.requiredRate} bpm, ${stats.dailyRate} per day`}</span>
                             </div>
                             <div class="detail-row">
                                 <span class="detail-label">Average Days per Book</span>
@@ -835,11 +881,13 @@
             if (previousYearChallenges.length > 0) {
                 html += `
                     <div class="previous-challenges-section">
-                        <div class="previous-challenges-header${previousChallengesExpanded ? ' expanded' : ''}" onclick="togglePreviousChallenges()">
-                            <span class="collapse-arrow">${ICON_CHEVRON_RIGHT}</span>
-                            <h2>Previous Challenges</h2>
-                        </div>
-                        <div class="previous-challenges-content${previousChallengesExpanded ? ' open' : ''}">
+                        <h2 class="previous-challenges-heading">
+                            <button class="previous-challenges-header${previousChallengesExpanded ? ' expanded' : ''}" aria-expanded="${previousChallengesExpanded}" aria-controls="previousChallenges" onclick="togglePreviousChallenges()">
+                                <span class="collapse-arrow">${ICON_CHEVRON_RIGHT}</span>
+                                <span class="previous-challenges-title">Previous Challenges</span>
+                            </button>
+                        </h2>
+                        <div class="previous-challenges-content${previousChallengesExpanded ? ' open' : ''}" id="previousChallenges">
                             ${previousYearChallenges.map(renderChallengeCard).join('')}
                         </div>
                     </div>
@@ -859,21 +907,15 @@
             if (!Number.isFinite(year) || year < 1900 || year > 2100) return null;
             if (!Number.isFinite(target) || target < 1) return null;
             const booksCompleted = Math.max(0, parseInt(item.booksCompleted, 10) || 0);
-            return { year, target, booksCompleted, locked: !!item.locked };
+            // autoLocked records that lockPreviousYears() has already had its one
+            // turn at this challenge, so a later manual unlock is not undone.
+            return { year, target, booksCompleted, locked: !!item.locked, autoLocked: !!item.autoLocked };
         }
 
+        // Precondition: year is the current year — the only case the card
+        // template renders a details panel for.
         function calculateStats(year, target, booksCompleted) {
             const now = new Date();
-            const currentYear = now.getFullYear();
-
-            if (!year || year < currentYear) {
-                return { monthsRemaining: '0.0', daysRemaining: '0', requiredRate: 'N/A', dailyRate: 'N/A', currentRate: 'N/A', booksAhead: 'N/A', avgDaysPerBook: 'N/A', remainingDaysPerBook: 'N/A', forecastTotal: 'N/A' };
-            }
-
-            if (year > currentYear) {
-                const isLeap = (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
-                return { monthsRemaining: '12.0', daysRemaining: String(isLeap ? 366 : 365), requiredRate: 'N/A', dailyRate: 'N/A', currentRate: 'N/A', booksAhead: 'N/A', avgDaysPerBook: 'N/A', remainingDaysPerBook: 'N/A', forecastTotal: 'N/A' };
-            }
 
             const startOfYear = new Date(year, 0, 1);
             const endOfYear = new Date(year, 11, 31, 23, 59, 59);
@@ -886,7 +928,7 @@
 
             const booksRemaining = Math.max(0, target - booksCompleted);
             const requiredRate = monthsRemaining > 0 ? (booksRemaining / monthsRemaining).toFixed(1) : 'N/A';
-            const dailyRate = daysRemaining > 0 ? ((booksRemaining / daysRemaining) * 100).toFixed(1) + '%' : 'N/A';
+            const dailyRate = daysRemaining > 0 ? (booksRemaining / daysRemaining).toFixed(2) : 'N/A';
             const currentRate = monthsElapsed > 0 ? (booksCompleted / monthsElapsed).toFixed(1) : 'N/A';
 
             const expectedBooks = target * (monthsElapsed / 12);
@@ -916,8 +958,14 @@
             };
         }
 
-        function toggleExpand(event, index) {
-            if (event.target.closest('button')) return;
+        function toggleExpand(event, index, fromArrow) {
+            // A tap on the card ignores anything that landed on an action button.
+            // The expand arrow is itself a button, so it opts out of that check.
+            if (fromArrow) {
+                event.stopPropagation();
+            } else if (event.target.closest('button')) {
+                return;
+            }
             if (expandedCards.has(index)) {
                 expandedCards.delete(index);
             } else {
@@ -947,6 +995,16 @@
 
             const challenges = loadChallenges();
 
+            // The challenge being edited can disappear while the form is open
+            // (deleted, imported over, or reset). Saving against a stale index
+            // would either throw or overwrite an unrelated challenge.
+            if (editingIndex !== null && !challenges[editingIndex]) {
+                alert('That challenge no longer exists.');
+                closeForm();
+                renderChallenges();
+                return;
+            }
+
             if (challenges.some((c, i) => c.year === year && i !== editingIndex)) {
                 alert(`A challenge for ${year} already exists.`);
                 return;
@@ -956,13 +1014,19 @@
             const shouldLock = year < currentYear;
 
             if (editingIndex !== null) {
-                const existingLocked = challenges[editingIndex].locked;
-                challenges[editingIndex] = { year, target, booksCompleted: Math.max(0, booksCompleted), locked: existingLocked || shouldLock };
+                const existing = challenges[editingIndex];
+                challenges[editingIndex] = {
+                    year,
+                    target,
+                    booksCompleted: Math.max(0, booksCompleted),
+                    locked: existing.locked || shouldLock,
+                    autoLocked: existing.autoLocked || shouldLock
+                };
             } else {
-                challenges.push({ year, target, booksCompleted: Math.max(0, booksCompleted), locked: shouldLock });
+                challenges.push({ year, target, booksCompleted: Math.max(0, booksCompleted), locked: shouldLock, autoLocked: shouldLock });
             }
 
-            saveChallenges(challenges);
+            if (!saveChallenges(challenges)) return;
 
             yearInput.value = '';
             targetInput.value = '';
@@ -995,6 +1059,7 @@
 
         function closeForm() {
             const form = document.getElementById('addForm');
+            const wasOpen = form.classList.contains('open');
             form.classList.remove('open');
             editingIndex = null;
             document.getElementById('formSubmitBtn').textContent = 'Add Challenge';
@@ -1002,13 +1067,17 @@
             document.getElementById('year').value = '';
             document.getElementById('target').value = '';
             document.getElementById('booksCompleted').value = '';
+
+            // A service worker update that landed while the form was open was
+            // deferred so it could not discard unsaved input; run it now.
+            if (wasOpen && reloadPending) window.location.reload();
         }
 
         function toggleLock(index) {
             const challenges = loadChallenges();
             if (challenges[index]) {
                 challenges[index].locked = !challenges[index].locked;
-                saveChallenges(challenges);
+                if (!saveChallenges(challenges)) return;
                 renderChallenges();
             }
         }
@@ -1017,7 +1086,7 @@
             const challenges = loadChallenges();
             if (challenges[index]) {
                 challenges[index].booksCompleted = Math.max(0, (challenges[index].booksCompleted ?? 0) + delta);
-                saveChallenges(challenges);
+                if (!saveChallenges(challenges)) return;
                 renderChallenges();
             }
         }
@@ -1026,7 +1095,7 @@
             if (confirm('Delete this challenge?')) {
                 const challenges = loadChallenges();
                 challenges.splice(index, 1);
-                saveChallenges(challenges);
+                if (!saveChallenges(challenges)) return;
                 // Splice shifts every later index down by one; remap the
                 // expanded set so it keeps pointing at the same cards.
                 const shifted = new Set();
@@ -1036,16 +1105,31 @@
                 });
                 expandedCards.clear();
                 shifted.forEach(i => expandedCards.add(i));
+                // editingIndex is a plain array index and would now point at the
+                // wrong challenge, so abandon any edit in progress.
+                if (editingIndex !== null) closeForm();
                 renderChallenges();
             }
         }
 
-        function toggleSettings() {
+        function setSettingsOpen(open) {
             const panel = document.getElementById('settingsPanel');
             const backdrop = document.getElementById('sheetBackdrop');
-            const isOpen = panel.classList.toggle('open');
-            backdrop.classList.toggle('open', isOpen);
-            document.body.style.overflow = isOpen ? 'hidden' : '';
+            panel.classList.toggle('open', open);
+            panel.setAttribute('aria-hidden', String(!open));
+            backdrop.classList.toggle('open', open);
+            document.getElementById('settingsBtn').setAttribute('aria-expanded', String(open));
+            document.body.style.overflow = open ? 'hidden' : '';
+        }
+
+        function toggleSettings() {
+            setSettingsOpen(!document.getElementById('settingsPanel').classList.contains('open'));
+        }
+
+        // Async callers (the import FileReader) must close the sheet rather than
+        // toggle it — the user may have dismissed it while the file was reading.
+        function closeSettings() {
+            setSettingsOpen(false);
         }
 
         function toggleAddForm() {
@@ -1099,11 +1183,19 @@
                     if (cleaned.some(c => c === null)) {
                         throw new Error('Invalid format');
                     }
-                    saveChallenges(cleaned);
+                    // saveChallenge() enforces one challenge per year; an import
+                    // that smuggled in duplicates would create cards that could
+                    // never be edited again.
+                    const years = new Set(cleaned.map(c => c.year));
+                    if (years.size !== cleaned.length) {
+                        throw new Error('Duplicate years');
+                    }
+                    if (!saveChallenges(cleaned)) return;
+                    closeForm();
                     expandedCards.clear();
                     expandCurrentYear();
                     renderChallenges();
-                    toggleSettings();
+                    closeSettings();
                     alert('Data imported successfully.');
                 } catch (err) {
                     alert('Failed to import data. Please check the file format.');
@@ -1115,21 +1207,30 @@
 
         function resetAllData() {
             if (confirm('Are you sure you want to reset all data? This cannot be undone.')) {
-                localStorage.removeItem(STORAGE_KEY);
+                try {
+                    localStorage.removeItem(STORAGE_KEY);
+                } catch (err) {
+                    alert('Could not clear your data.');
+                    return;
+                }
+                closeForm();
                 expandedCards.clear();
                 renderChallenges();
-                toggleSettings();
+                closeSettings();
             }
         }
 
+        // Auto-lock each past year exactly once. Re-locking on every load would
+        // silently undo a deliberate unlock the next time the app opens.
         function lockPreviousYears() {
             const currentYear = new Date().getFullYear();
             const challenges = loadChallenges();
             let changed = false;
 
             challenges.forEach(c => {
-                if (c.year && c.year < currentYear && !c.locked) {
+                if (c.year < currentYear && !c.autoLocked) {
                     c.locked = true;
+                    c.autoLocked = true;
                     changed = true;
                 }
             });
@@ -1245,9 +1346,16 @@
             const hadController = !!navigator.serviceWorker.controller;
             navigator.serviceWorker.register('./sw.js').catch(e => console.warn('SW registration failed:', e));
             // When a new service worker takes control of an already-controlled
-            // page, reload once to pick up the latest version.
+            // page, reload once to pick up the latest version — but never while
+            // the user has unsaved input in the add/edit form. closeForm() runs
+            // the deferred reload once the form is out of the way.
             navigator.serviceWorker.addEventListener('controllerchange', () => {
-                if (hadController) window.location.reload();
+                if (!hadController) return;
+                if (document.getElementById('addForm').classList.contains('open')) {
+                    reloadPending = true;
+                    return;
+                }
+                window.location.reload();
             });
         }
 
@@ -1257,7 +1365,7 @@
         document.getElementById('chevronExport').innerHTML = ICON_CHEVRON_RIGHT;
         document.getElementById('chevronImport').innerHTML = ICON_CHEVRON_RIGHT;
         document.getElementById('versionInfo').textContent = `Version ${APP_VERSION}`;
-        applyTheme(loadSettings().theme || 'dark');
+        applyTheme(loadSettings().theme || preferredTheme());
         lockPreviousYears();
         expandCurrentYear();
         renderChallenges();
