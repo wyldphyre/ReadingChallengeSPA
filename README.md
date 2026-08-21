@@ -9,13 +9,15 @@ A simple single-page application for tracking yearly reading challenge statistic
 - Visual progress bar showing percentage complete (turns green when target met)
 - Increment/decrement buttons for quick updates
 - Edit existing challenges
-- Lock/unlock challenges (past years auto-lock)
+- Lock/unlock challenges (past years auto-lock once, and a manual unlock sticks)
+- Locked challenges are protected from editing, counting, and deletion
 - Expandable statistics for current year challenge
 - Export and import data as JSON
 - Data persists locally using localStorage
 - Challenges sorted by year (newest first)
-- Dark mode color scheme
+- Light and dark themes, following the system setting until you choose one
 - Settings panel with reset data option
+- Keyboard accessible, with labelled controls for screen readers
 
 ## Usage
 
@@ -32,14 +34,17 @@ A simple single-page application for tracking yearly reading challenge statistic
 - Use the **−** button to decrement completed reads
 - Use the **pencil** button to edit a challenge
 - Use the **lock** button to lock/unlock a challenge
-- Use the **×** button to delete a challenge
+- Use the **×** button to delete a challenge (disabled while locked)
 - Tap a challenge card to expand and view statistics (current year only)
 
 ### Settings
 
 Tap the gear icon in the header to access settings:
+- **Theme** - Switch between dark and light
 - **Export Data** - Download challenges as a JSON file
-- **Import Data** - Restore challenges from a JSON file
+- **Import Data** - Restore challenges from a JSON file. Files are validated:
+  malformed entries, out-of-range years, and duplicate years are rejected and
+  leave your existing data untouched
 - **Reset All Data** - Clears all stored challenges (with confirmation)
 
 ## Installation on iPhone
@@ -56,6 +61,16 @@ Once hosted, open the URL in Safari on your iPhone, then:
 1. Tap the Share button (box with arrow)
 2. Select "Add to Home Screen"
 3. The app installs and runs in standalone mode without browser UI
+
+## Tests
+
+The test suite extracts the inline script from `index.html` and runs it against a
+stubbed DOM, so it exercises the shipped code directly. No dependencies and no
+build step — just Node:
+
+```
+node tests/app.test.js
+```
 
 ## Technical Details
 
