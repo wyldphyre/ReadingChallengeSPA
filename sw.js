@@ -1,7 +1,7 @@
 // Update this version string whenever you deploy a new version of the app.
 // The browser detects when sw.js changes and installs the updated service worker,
 // which then caches the new index.html and discards the old cache.
-const CACHE_NAME = 'reading-challenges-v1.3.3';
+const CACHE_NAME = 'reading-challenges-v1.3.4';
 
 // The app is reachable both as the bare scope (".../") and as ".../index.html",
 // so cache both — matching on only one leaves the other failing offline.
