@@ -4,7 +4,7 @@
 // from index.html against a stubbed DOM — so these exercise shipped code, not a
 // re-implementation of it.
 
-const { createApp } = require('./harness.js');
+const { createApp, contrastRatio, readTheme } = require('./harness.js');
 
 const YEAR = new Date().getFullYear();
 let passed = 0;
@@ -399,6 +399,56 @@ test('opening settings updates aria state on both sheet and trigger', () => {
     eq(d.getElementById('settingsPanel').getAttribute('aria-hidden'), 'true');
     eq(d.getElementById('settingsBtn').getAttribute('aria-expanded'), 'false');
 });
+
+/* ------------------------------------------------------------------ *
+ * colour contrast — text must stay legible against its own surface   *
+ * ------------------------------------------------------------------ */
+group('colour contrast');
+
+const THEMES = [
+    ['dark', readTheme(':root')],
+    ['light', readTheme('[data-theme="light"]')]
+];
+
+// WCAG 2.1 AA: 4.5:1 for normal text, 3:1 for icons and other non-text UI.
+const AA_TEXT = 4.5;
+const AA_NON_TEXT = 3;
+
+for (const [themeName, t] of THEMES) {
+    test(themeName + ': stat labels are legible on a challenge card', () => {
+        const r = contrastRatio(t['--color-text-muted'], t['--color-surface']);
+        ok(r >= AA_TEXT, `--color-text-muted on --color-surface is ${r.toFixed(2)}:1, need ${AA_TEXT}:1`);
+    });
+
+    test(themeName + ': muted text is legible on the page background', () => {
+        // .empty-state and form labels sit on --color-bg, not a card.
+        const r = contrastRatio(t['--color-text-muted'], t['--color-bg']);
+        ok(r >= AA_TEXT, `--color-text-muted on --color-bg is ${r.toFixed(2)}:1, need ${AA_TEXT}:1`);
+    });
+
+    test(themeName + ': secondary and primary text clear the same bar', () => {
+        for (const token of ['--color-text-secondary', '--color-text-primary']) {
+            const r = contrastRatio(t[token], t['--color-surface']);
+            ok(r >= AA_TEXT, `${token} on --color-surface is ${r.toFixed(2)}:1`);
+        }
+    });
+
+    test(themeName + ': the lock icon is legible on its button', () => {
+        const r = contrastRatio(t['--color-text-muted'], t['--color-surface-hover']);
+        ok(r >= AA_NON_TEXT, `--color-text-muted on --color-surface-hover is ${r.toFixed(2)}:1, need ${AA_NON_TEXT}:1`);
+    });
+
+    test(themeName + ': the text hierarchy keeps its ordering', () => {
+        // muted must stay visibly softer than secondary, which stays softer
+        // than primary — raising contrast must not flatten the hierarchy.
+        const onSurface = tok => contrastRatio(t[tok], t['--color-surface']);
+        const muted = onSurface('--color-text-muted');
+        const secondary = onSurface('--color-text-secondary');
+        const primary = onSurface('--color-text-primary');
+        ok(muted < secondary, `muted (${muted.toFixed(2)}) should be softer than secondary (${secondary.toFixed(2)})`);
+        ok(secondary < primary, `secondary (${secondary.toFixed(2)}) should be softer than primary (${primary.toFixed(2)})`);
+    });
+}
 
 /* -------- */
 console.log('\n' + (failures.length

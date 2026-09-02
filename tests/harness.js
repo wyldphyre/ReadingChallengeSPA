@@ -116,4 +116,36 @@ function createApp(initialChallenges) {
     };
 }
 
-module.exports = { createApp, makeEl };
+/* ---------- colour helpers, for the contrast regression tests ---------- */
+
+// Relative luminance and contrast ratio per WCAG 2.1.
+function luminance(hex) {
+    const h = hex.replace('#', '');
+    const chan = [0, 2, 4].map(i => {
+        const c = parseInt(h.slice(i, i + 2), 16) / 255;
+        return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+    });
+    return 0.2126 * chan[0] + 0.7152 * chan[1] + 0.0722 * chan[2];
+}
+
+function contrastRatio(a, b) {
+    const la = luminance(a), lb = luminance(b);
+    const [hi, lo] = la > lb ? [la, lb] : [lb, la];
+    return (hi + 0.05) / (lo + 0.05);
+}
+
+// Pull the custom properties out of a theme block in index.html, so the tests
+// assert against the real palette rather than a copy of it.
+function readTheme(selector) {
+    const css = fs.readFileSync(INDEX, 'utf8');
+    const start = css.indexOf(selector + ' {');
+    if (start === -1) throw new Error('theme block not found: ' + selector);
+    const block = css.slice(start, css.indexOf('}', start));
+    const tokens = {};
+    for (const m of block.matchAll(/(--[\w-]+):\s*(#[0-9a-fA-F]{6})\s*;/g)) {
+        tokens[m[1]] = m[2];
+    }
+    return tokens;
+}
+
+module.exports = { createApp, makeEl, contrastRatio, luminance, readTheme };
